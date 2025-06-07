@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#FFD180</color> <!-- Màu chính mới -->
+    <color name="colorPrimaryDark">#FFAB40</color> <!-- Hơi đậm hơn để có độ phân biệt -->
+    <color name="colorAccent">#FFB74D</color> <!-- Accent phù hợp -->
+
+    <color name="colorCardBackground">#FFF3E0</color> <!-- pastel cam nhạt -->
+    <color name="colorHighlight">#FFE0B2</color> <!-- nhấn nhẹ -->
+
+
+    <color name="colorBackground">#FFFFFF</color>
+    <color name="white">#FFFFFF</color>
+    <color name="colorTextPrimary">#000000</color>
+    <color name="black">#000000</color>
+    <color name="colorTextSecondary">#616161</color>
+    <color name="gray">#616161</color>
+    <color name="colorPlaceholder">#F5F5F5</color>
+    <color name="colorDivider">#E0E0E0</color>
+</resources>

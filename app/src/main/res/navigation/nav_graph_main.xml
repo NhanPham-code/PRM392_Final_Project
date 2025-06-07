@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph_main"
+    app:startDestination="@id/listProductFragment">
+    <fragment
+        android:id="@+id/listProductFragment"
+        android:name="com.example.bakeryshop.Fragments.ListProductFragment"
+        android:label="fragment_list_product"
+        tools:layout="@layout/fragment_list_product" />
+    <fragment
+        android:id="@+id/cartFragment"
+        android:name="com.example.bakeryshop.Fragments.CartFragment"
+        android:label="fragment_cart"
+        tools:layout="@layout/fragment_cart" />
+    <fragment
+        android:id="@+id/feedbackListFragment"
+        android:name="com.example.bakeryshop.Fragments.FeedbackListFragment"
+        android:label="fragment_feedback_list"
+        tools:layout="@layout/fragment_feedback_list" />
+    <fragment
+        android:id="@+id/favoriteListFragment"
+        android:name="com.example.bakeryshop.Fragments.FavoriteListFragment"
+        android:label="fragment_favorite_list"
+        tools:layout="@layout/fragment_favorite_list" />
+
+
+</navigation>
