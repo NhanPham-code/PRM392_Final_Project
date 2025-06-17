@@ -54,15 +54,10 @@ public class MainActivity extends AppCompatActivity {
         binding.drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
+
         binding.navigationView.setNavigationItemSelectedListener(item -> {
             Fragment selectedFragment = null;
-            if (item.getItemId() == R.id.nav_profile) {
-                if (profileFragment == null) {
-                    profileFragment = new ProfileFragment();
-                }
-                selectedFragment = profileFragment;
-                Toast.makeText(this, "Profile clicked", Toast.LENGTH_SHORT).show();
-            } else if (item.getItemId() == R.id.nav_feedback) {
+            if (item.getItemId() == R.id.nav_feedback) {
                 if (feedbackListFragment == null) {
                     feedbackListFragment = new FeedbackListFragment();
                 }
@@ -101,6 +96,13 @@ public class MainActivity extends AppCompatActivity {
                 }
                 selectedFragment = cartFragment;
                 Toast.makeText(this, "Cart clicked", Toast.LENGTH_SHORT).show();
+            }
+            else if (item.getItemId() == R.id.nav_profile) {
+                if (profileFragment == null) {
+                    profileFragment = new ProfileFragment();
+                }
+                selectedFragment = profileFragment;
+                Toast.makeText(this, "Profile clicked", Toast.LENGTH_SHORT).show();
             }
             replaceFragment(selectedFragment);
             return true;

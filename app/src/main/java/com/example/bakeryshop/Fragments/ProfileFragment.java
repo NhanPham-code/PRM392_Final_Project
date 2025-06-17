@@ -1,5 +1,6 @@
 package com.example.bakeryshop.Fragments;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -7,6 +8,8 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.example.bakeryshop.R;
 
@@ -61,6 +64,55 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_profile, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_profile, container, false);
+
+        // Find the LinearLayout within the inflated view
+        LinearLayout layoutPersonalInfo = rootView.findViewById(R.id.layoutPersonalInfo);
+        layoutPersonalInfo.setOnClickListener(v -> openPersonalInfoDialog());
+
+        LinearLayout layoutAccountSetting = rootView.findViewById(R.id.layoutAccountSettings);
+        layoutAccountSetting.setOnClickListener(v -> openAccountSettingsDialog());
+        return rootView; // Return the inflated view
+    }
+
+    private void openPersonalInfoDialog() {
+        // Lấy view từ layout tùy chỉnh
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_personal_info, null);
+
+        AlertDialog dialog = new AlertDialog.Builder(getContext())
+                .setTitle("Personal Information") // Tiêu đề dialog
+                .setView(dialogView)              // Gán view tùy chỉnh
+                .setPositiveButton("Save", (d, w) -> {
+                    savePersonalInfo(dialogView); // Hàm xử lý lưu thông tin
+                    Toast.makeText(getContext(), "Personal information updated successfully!", Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("Cancel", null) // Nút Hủy, không làm gì khi bấm
+                .create();
+
+        dialog.show(); // Hiển thị dialog
+    }
+
+    private void openAccountSettingsDialog() {
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_account_settings, null);
+
+        AlertDialog dialog = new AlertDialog.Builder(getContext())
+                .setTitle("Account Settings")
+                .setView(dialogView)
+                .setPositiveButton("Save", (d, w) -> {
+                    // Save account settings
+                    saveAccountSettings(dialogView);
+                    Toast.makeText(getContext(), "Account settings updated successfully!", Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("Cancel", null)
+                .create();
+
+        dialog.show();
+    }
+
+    private void savePersonalInfo(View dialogView) {
+    }
+
+
+    private void saveAccountSettings(View dialogView) {
     }
 }
