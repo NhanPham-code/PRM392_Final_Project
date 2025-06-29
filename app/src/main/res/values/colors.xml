@@ -17,4 +17,12 @@
     <color name="colorPlaceholder">#F5F5F5</color>
     <color name="colorDivider">#E0E0E0</color>
     <color name="orange">#FF7F50</color>
+
+    <color name="bakery_brown">#8B4513</color>
+    <color name="bakery_gold">#DAA520</color>
+    <color name="bakery_cream">#FFF8DC</color>
+    <color name="bakery_orange">#FF8C00</color>
+    <color name="bakery_light_brown">#D2B48C</color>
+    <color name="bakery_warm_white">#FFFEF7</color>
+    <color name="badge_red">#FF4444</color>
 </resources>

@@ -9,5 +9,15 @@
         android:id="@+id/nav_feedback"
         android:title="Feedback"
         android:icon="@drawable/ic_feedback"/>
+
+    <item
+        android:id="@+id/nav_map"
+        android:title="Location"
+        android:icon="@drawable/ic_location"/>
+
+    <item
+        android:id="@+id/nav_chat"
+        android:title="Chat"
+        android:icon="@drawable/ic_chat"/>
 </menu>
 

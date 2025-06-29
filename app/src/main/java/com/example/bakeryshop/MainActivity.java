@@ -1,23 +1,16 @@
 package com.example.bakeryshop;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.NavController;
-import androidx.navigation.fragment.NavHostFragment;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 
 import com.example.bakeryshop.Fragments.CartFragment;
-import com.example.bakeryshop.Fragments.FavoriteListFragment;
-import com.example.bakeryshop.Fragments.FeedbackListFragment;
 import com.example.bakeryshop.Fragments.ListProductFragment;
 import com.example.bakeryshop.Fragments.NotificationFragment;
 import com.example.bakeryshop.Fragments.ProfileFragment;
@@ -29,10 +22,13 @@ public class MainActivity extends AppCompatActivity {
 
     private ListProductFragment listProductFragment;
     private CartFragment cartFragment;
-    private FeedbackListFragment feedbackListFragment;
-    private FavoriteListFragment favoriteListFragment;
     private ProfileFragment profileFragment;
     private NotificationFragment notificationFragment;
+
+    // SharedPreferences để lưu trữ token
+    private SharedPreferences sharedPreferences;
+    private static final String PREFS_NAME = "BakeryShopPrefs";
+    private static final String KEY_TOKEN = "auth_token";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,18 +50,14 @@ public class MainActivity extends AppCompatActivity {
         binding.drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-
+        // Navigation Drawer View setup
         binding.navigationView.setNavigationItemSelectedListener(item -> {
-            Fragment selectedFragment = null;
-            if (item.getItemId() == R.id.nav_feedback) {
-                if (feedbackListFragment == null) {
-                    feedbackListFragment = new FeedbackListFragment();
-                }
-                selectedFragment = feedbackListFragment;
-                Toast.makeText(this, "Feed clicked", Toast.LENGTH_SHORT).show();
+            // check login before opening
+            if (isLogin()) {
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(intent);
+                return false; // Nếu chưa đăng nhập, không mở fragment
             }
-            replaceFragment(selectedFragment);
-            binding.drawerLayout.closeDrawers();
             return true;
         });
 
@@ -77,20 +69,27 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Products clicked", Toast.LENGTH_SHORT).show();
             }
             else if (item.getItemId() == R.id.nav_notifications) {
+                // Kiểm tra đăng nhập trước khi mở NotificationFragment
+                if (!isLogin()) {
+                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                    return false; // Nếu chưa đăng nhập, không mở fragment
+                }
+                // Nếu đã đăng nhập, mở NotificationFragment
                 if (notificationFragment == null) {
                     notificationFragment = new NotificationFragment();
                 }
                 selectedFragment = notificationFragment;
                 Toast.makeText(this, "Notification clicked", Toast.LENGTH_SHORT).show();
             }
-            else if (item.getItemId() == R.id.nav_favorites) {
-                if (favoriteListFragment == null) {
-                    favoriteListFragment = new FavoriteListFragment();
-                }
-                selectedFragment = favoriteListFragment;
-                Toast.makeText(this, "Favorites clicked", Toast.LENGTH_SHORT).show();
-            }
             else if (item.getItemId() == R.id.nav_carts) {
+                // Kiểm tra đăng nhập trước khi mở CartFragment
+                if (!isLogin()) {
+                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                    return false; // Nếu chưa đăng nhập, không mở fragment
+                }
+                // Nếu đã đăng nhập, mở CartFragment
                 if (cartFragment == null) {
                     cartFragment = new CartFragment();
                 }
@@ -98,6 +97,13 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Cart clicked", Toast.LENGTH_SHORT).show();
             }
             else if (item.getItemId() == R.id.nav_profile) {
+                // Kiểm tra đăng nhập trước khi mở ProfileFragment
+                if (!isLogin()) {
+                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                    return false; // Nếu chưa đăng nhập, không mở fragment
+                }
+                // Nếu đã đăng nhập, mở ProfileFragment
                 if (profileFragment == null) {
                     profileFragment = new ProfileFragment();
                 }
@@ -113,5 +119,16 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, fragment)
                 .commit();
+    }
+
+    private boolean isLogin() {
+        sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        String token = sharedPreferences.getString(KEY_TOKEN, null);
+        if (token != null) {
+            return true; // Người dùng đã đăng nhập
+        } else {
+            Toast.makeText(this, "Vui lòng đăng nhập để tiếp tục!", Toast.LENGTH_SHORT).show();
+            return false; // Người dùng chưa đăng nhập
+        }
     }
 }
