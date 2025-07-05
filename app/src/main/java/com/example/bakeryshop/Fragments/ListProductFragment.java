@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,6 +45,7 @@ public class ListProductFragment extends Fragment {
 
         // Set up RecyclerView
         ProductAdapter productAdapter = new ProductAdapter();
+
         binding.recyclerViewProducts.setLayoutManager(new GridLayoutManager(getContext(), 2));
         binding.recyclerViewProducts.setAdapter(productAdapter);
 

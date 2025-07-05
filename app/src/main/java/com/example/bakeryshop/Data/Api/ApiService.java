@@ -31,4 +31,7 @@ public interface ApiService {
 
     @GET("products/search")
     Call<List<ReadProductDTO>> searchProducts(@Query("searchKey") String searchKey);
+
+    @GET("products/{id}")
+    Call<ReadProductDTO> getProductById(@Path("id") int productId);
 }
