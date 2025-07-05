@@ -26,4 +26,9 @@ public class ProductRepository {
     public Call<List<ReadProductDTO>> searchProducts(String searchKey) {
         return apiService.searchProducts(searchKey);
     }
+
+    public Call<ReadProductDTO> getProductById(int productId) {
+        return apiService.getProductById(productId);
+    }
 }
+

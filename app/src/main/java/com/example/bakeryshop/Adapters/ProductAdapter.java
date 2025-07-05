@@ -1,5 +1,6 @@
 package com.example.bakeryshop.Adapters;
 
+import android.content.Intent;
 import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bakeryshop.Data.DTO.ReadProductDTO;
+import com.example.bakeryshop.ProductDetailActivity;
 import com.example.bakeryshop.R;
 
 import java.text.DecimalFormat;
@@ -56,6 +58,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         private ImageView productImage;
         private TextView productName;
         private TextView productPrice;
+        int resourceId;
 
         public ProductViewHolder(View itemView) {
             super(itemView);
@@ -65,9 +68,11 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             productPrice = itemView.findViewById(R.id.txtProductPrice);
         }
 
+
         // Phương thức để bind dữ liệu ReadProductDTO vào các View
         public void bind(ReadProductDTO product) { // Sử dụng ReadProductDTO
             productName.setText(product.getProductName());
+
 
             DecimalFormat formatter = new DecimalFormat("#,##0₫"); // Định dạng giá
             productPrice.setText(formatter.format(product.getPrice()));
@@ -80,7 +85,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
                 String drawableName = fileName.toLowerCase(); // Tên drawable thường là chữ thường
 
                 // Lấy ID tài nguyên drawable từ tên sử dụng context của itemView
-                int resourceId = itemView.getContext().getResources().getIdentifier(
+                resourceId = itemView.getContext().getResources().getIdentifier(
                         drawableName, "drawable", itemView.getContext().getPackageName());
 
                 if (resourceId != 0) {
@@ -97,6 +102,13 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             // Xử lý sự kiện click trên item (tùy chọn)
             itemView.setOnClickListener(v -> {
                 // TODO: Xử lý sự kiện khi click vào item sản phẩm
+                Intent intent = new Intent(itemView.getContext(), ProductDetailActivity.class);
+                intent.putExtra("product", product); // Truyền ID sản phẩm qua Intent
+                if(resourceId != 0){
+                    intent.putExtra("resourceId", resourceId);
+                }
+
+                itemView.getContext().startActivity(intent);
                 Toast.makeText(itemView.getContext(), "Clicked product: " + product.getProductName(), Toast.LENGTH_SHORT).show();
             });
         }

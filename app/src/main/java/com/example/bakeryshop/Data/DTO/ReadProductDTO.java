@@ -2,7 +2,9 @@ package com.example.bakeryshop.Data.DTO;
 
 import com.google.gson.annotations.SerializedName;
 
-public class ReadProductDTO {
+import java.io.Serializable;
+
+public class ReadProductDTO implements Serializable {
     @SerializedName("productID")
     private int productId;
     @SerializedName("productName")
