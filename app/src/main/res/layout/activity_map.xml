@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MapActivity">
+
+    <!-- Container cho phần nhập địa chỉ -->
+    <LinearLayout
+        android:id="@+id/addressContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:elevation="4dp"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Tiêu đề -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Địa chỉ giao hàng"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Container cho ô nhập địa chỉ -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp">
+
+            <!-- Ô nhập địa chỉ -->
+            <EditText
+                android:id="@+id/editTextAddress"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/address_input_background"
+                android:hint="Nhập địa chỉ của bạn"
+                android:paddingStart="16dp"
+                android:paddingEnd="50dp"
+                android:textSize="14sp"
+                android:maxLines="1"
+                android:inputType="textPostalAddress" />
+
+            <!-- Icon vị trí hiện tại trong ô nhập -->
+            <ImageButton
+                android:id="@+id/buttonCurrentLocationIcon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="4dp"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_my_location"
+                android:contentDescription="Sử dụng vị trí hiện tại"
+                android:scaleType="centerInside" />
+
+        </RelativeLayout>
+
+        <!-- Container cho các nút -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <!-- Nút sử dụng vị trí hiện tại -->
+            <Button
+                android:id="@+id/buttonUseCurrentLocation"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/button_current_location_background"
+                android:text="Sử dụng vị trí hiện tại"
+                android:textColor="@android:color/white"
+                android:textSize="12sp"
+                android:drawableStart="@drawable/ic_location_on"
+                android:drawablePadding="4dp"
+                android:gravity="center" />
+
+            <!-- Nút tìm kiếm -->
+            <Button
+                android:id="@+id/buttonSearch"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/button_search_background"
+                android:text="Tìm kiếm"
+                android:textColor="@android:color/white"
+                android:textSize="12sp"
+                android:drawableStart="@drawable/ic_search"
+                android:drawablePadding="4dp"
+                android:gravity="center" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Bản đồ -->
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/addressContainer"
+        tools:context=".MainActivity" />
+
+</RelativeLayout>

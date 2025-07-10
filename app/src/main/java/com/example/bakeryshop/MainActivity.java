@@ -53,11 +53,23 @@ public class MainActivity extends AppCompatActivity {
         // Navigation Drawer View setup
         binding.navigationView.setNavigationItemSelectedListener(item -> {
             // check login before opening
-            if (isLogin()) {
+            if (!isLogin()) {
                 Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(intent);
                 return false; // Nếu chưa đăng nhập, không mở fragment
             }
+
+            if (item.getItemId() == R.id.nav_map) {
+                Intent intent = new Intent(MainActivity.this, Local.class);
+                startActivity(intent);
+                binding.drawerLayout.closeDrawers();
+            }
+            if (item.getItemId() == R.id.nav_chat) {
+                Intent intent = new Intent(MainActivity.this, ChatActivity.class);
+                startActivity(intent);
+                binding.drawerLayout.closeDrawers();
+            }
+
             return true;
         });
 
