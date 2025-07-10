@@ -8,12 +8,13 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.bakeryshop.Data.Api.ApiClient;
-import com.example.bakeryshop.Data.Api.ApiService;
+import com.example.bakeryshop.Data.Api.ApiClient; // Vẫn cần cho Repository
+import com.example.bakeryshop.Data.Api.ApiService; // Vẫn cần cho Repository
 import com.example.bakeryshop.Data.DTO.CartDisplayItem;
 import com.example.bakeryshop.Data.DTO.CartItemDTO;
 import com.example.bakeryshop.Data.DTO.ReadProductDTO;
 import com.example.bakeryshop.Data.DTO.UpdateCartQuantityRequest;
+import com.example.bakeryshop.Data.Repository.CartRepository; // MỚI: Import CartRepository
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,7 +27,9 @@ import retrofit2.Response;
 
 public class CartViewModel extends AndroidViewModel {
 
-    private final ApiService apiService;
+    // THAY THẾ ApiService BẰNG CartRepository
+    private final CartRepository cartRepository; // Đổi từ ApiService sang CartRepository
+
     private final MutableLiveData<List<CartDisplayItem>> _cartItems = new MutableLiveData<>();
     public LiveData<List<CartDisplayItem>> cartItems = _cartItems;
 
@@ -36,33 +39,40 @@ public class CartViewModel extends AndroidViewModel {
     private final MutableLiveData<String> _error = new MutableLiveData<>();
     public LiveData<String> error = _error;
 
+    // LiveData riêng để báo cáo thành công/thất bại cho các thao tác CRUD cụ thể (tùy chọn)
+    private final MutableLiveData<Boolean> _deleteSuccess = new MutableLiveData<>();
+    public LiveData<Boolean> deleteSuccess = _deleteSuccess;
+
+    private final MutableLiveData<Boolean> _updateSuccess = new MutableLiveData<>();
+    public LiveData<Boolean> updateSuccess = _updateSuccess;
+
+
     private Map<Integer, Integer> initialQuantities = new HashMap<>();
 
     public CartViewModel(@NonNull Application application) {
         super(application);
-        apiService = ApiClient.getInstance(application).getApiService();
+        // KHỞI TẠO CartRepository thay vì ApiService
+        cartRepository = new CartRepository(application.getApplicationContext());
     }
 
     public void fetchCartItems() {
         _isLoading.setValue(true);
-        apiService.getCartByToken().enqueue(new Callback<List<CartItemDTO>>() {
+        // GỌI PHƯƠNG THỨC TỪ Repository
+        cartRepository.getCartByUser().enqueue(new Callback<List<CartItemDTO>>() {
             @Override
             public void onResponse(@NonNull Call<List<CartItemDTO>> call, @NonNull Response<List<CartItemDTO>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<CartItemDTO> cartItemDTOS = response.body();
                     List<CartDisplayItem> displayItems = new ArrayList<>();
                     initialQuantities.clear();
-                    // Lưu ý: Cần một cách để chờ tất cả ProductDetails được fetch xong.
-                    // Sử dụng AtomicInteger hoặc đếm số lượng response.
-                    // Đơn giản hơn: fetch product list trước, rồi mới kết hợp.
-                    // Tạm thời, tôi giữ nguyên cách bạn làm để tập trung vào lỗi hiện tại.
+
                     if (cartItemDTOS.isEmpty()) {
-                        _cartItems.setValue(new ArrayList<>()); // Đặt danh sách rỗng nếu không có gì
+                        _cartItems.setValue(new ArrayList<>());
                         _isLoading.setValue(false);
                     } else {
-                        // Tạo một đối tượng đếm để biết khi nào tất cả sản phẩm đã được fetch
                         final int[] fetchedProductsCount = {0};
                         for (CartItemDTO cartItem : cartItemDTOS) {
+                            // GỌI PHƯƠNG THỨC TỪ Repository
                             fetchProductDetails(cartItem, displayItems, cartItemDTOS.size(), fetchedProductsCount);
                             initialQuantities.put(cartItem.getCartID(), cartItem.getQuantity());
                         }
@@ -70,7 +80,15 @@ public class CartViewModel extends AndroidViewModel {
 
                 } else {
                     Log.e("CartViewModel", "Failed to get cart items. Code: " + response.code() + ", Message: " + response.message());
-                    _error.setValue("Không lấy được giỏ hàng. Mã lỗi: " + response.code());
+                    String errorMessage = "Không lấy được giỏ hàng.";
+                    try {
+                        if (response.errorBody() != null) {
+                            errorMessage = response.errorBody().string();
+                        }
+                    } catch (Exception e) {
+                        Log.e("CartViewModel", "Error parsing error body: " + e.getMessage());
+                    }
+                    _error.setValue(errorMessage);
                     _isLoading.setValue(false);
                 }
             }
@@ -85,21 +103,27 @@ public class CartViewModel extends AndroidViewModel {
     }
 
     private void fetchProductDetails(CartItemDTO cartItem, List<CartDisplayItem> displayItems, int totalCartItems, int[] fetchedProductsCount) {
-        apiService.getProductById(cartItem.getProductID()).enqueue(new Callback<ReadProductDTO>() {
+        // GỌI PHƯƠNG THỨC TỪ Repository
+        cartRepository.getProductById(cartItem.getProductID()).enqueue(new Callback<ReadProductDTO>() {
             @Override
             public void onResponse(@NonNull Call<ReadProductDTO> call, @NonNull Response<ReadProductDTO> response) {
-                synchronized (fetchedProductsCount) { // Đồng bộ hóa việc đếm
+                synchronized (fetchedProductsCount) {
                     if (response.isSuccessful() && response.body() != null) {
                         displayItems.add(new CartDisplayItem(cartItem, response.body()));
                     } else {
                         Log.e("CartViewModel", "Failed to get product details for item " + cartItem.getProductID() + ". Code: " + response.code());
-                        // Có thể thêm một placeholder item hoặc bỏ qua item này
-                        _error.setValue("Không lấy được chi tiết sản phẩm cho id: " + cartItem.getProductID());
+                        String errorMessage = "Không lấy được chi tiết sản phẩm cho id: " + cartItem.getProductID();
+                        try {
+                            if (response.errorBody() != null) {
+                                errorMessage += " - " + response.errorBody().string();
+                            }
+                        } catch (Exception e) {
+                            Log.e("CartViewModel", "Error parsing error body for product details: " + e.getMessage());
+                        }
+                        _error.setValue(errorMessage);
                     }
                     fetchedProductsCount[0]++;
                     if (fetchedProductsCount[0] == totalCartItems) {
-                        // Sắp xếp lại danh sách nếu cần thiết (ví dụ theo cartId)
-                        // Collections.sort(displayItems, (item1, item2) -> Integer.compare(item1.getCartItem().getCartId(), item2.getCartItem().getCartId()));
                         _cartItems.setValue(displayItems);
                         _isLoading.setValue(false);
                     }
@@ -113,7 +137,7 @@ public class CartViewModel extends AndroidViewModel {
                     _error.setValue("Lỗi kết nối khi lấy chi tiết sản phẩm: " + t.getMessage());
                     fetchedProductsCount[0]++;
                     if (fetchedProductsCount[0] == totalCartItems) {
-                        _cartItems.setValue(displayItems); // Vẫn hiển thị những gì đã fetch được
+                        _cartItems.setValue(displayItems);
                         _isLoading.setValue(false);
                     }
                 }
@@ -122,19 +146,18 @@ public class CartViewModel extends AndroidViewModel {
     }
 
 
-    // MỚI: Phương thức để tăng/giảm số lượng của một sản phẩm trong ViewModel
-    // ViewModel chỉ chịu trách nhiệm cập nhật dữ liệu, giới hạn đã xử lý ở Adapter
     public void updateQuantityLocally(CartDisplayItem item, int change) {
         int newQuantity = item.getCartItem().getQuantity() + change;
         if (newQuantity < 1) newQuantity = 1; // Giới hạn dưới 1
-        // Không cần kiểm tra stockQuantity ở đây vì Adapter đã xử lý rồi
         item.getCartItem().setQuantity(newQuantity);
-        _cartItems.setValue(_cartItems.getValue()); // Kích hoạt observer để UI cập nhật (nếu Adapter không cập nhật trực tiếp)
+        _cartItems.setValue(_cartItems.getValue());
     }
 
     public void deleteCartItem(CartDisplayItem itemToDelete) {
         _isLoading.setValue(true);
-        apiService.deleteCartItem(itemToDelete.getCartItem().getCartID()).enqueue(new Callback<Void>() {
+        _deleteSuccess.setValue(null); // Reset trạng thái trước khi gọi API
+        // GỌI PHƯƠNG THỨC TỪ Repository
+        cartRepository.deleteCartItem(itemToDelete.getCartItem().getCartID()).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
                 if (response.isSuccessful()) {
@@ -145,10 +168,20 @@ public class CartViewModel extends AndroidViewModel {
                         updatedItems.remove(itemToDelete);
                         _cartItems.setValue(updatedItems);
                     }
-                    _error.setValue("Đã xóa sản phẩm khỏi giỏ hàng.");
+                    _deleteSuccess.setValue(true); // Báo cáo thành công
+                    _error.setValue("Đã xóa sản phẩm khỏi giỏ hàng."); // Thông báo lỗi (có thể dùng LiveData riêng cho thông báo)
                 } else {
                     Log.e("CartViewModel", "Failed to delete cart item. Code: " + response.code() + ", Message: " + response.message());
-                    _error.setValue("Không thể xóa sản phẩm. Mã lỗi: " + response.code());
+                    String errorMessage = "Không thể xóa sản phẩm.";
+                    try {
+                        if (response.errorBody() != null) {
+                            errorMessage += " - " + response.errorBody().string();
+                        }
+                    } catch (Exception e) {
+                        Log.e("CartViewModel", "Error parsing error body for delete: " + e.getMessage());
+                    }
+                    _deleteSuccess.setValue(false); // Báo cáo thất bại
+                    _error.setValue(errorMessage);
                 }
                 _isLoading.setValue(false);
             }
@@ -156,6 +189,7 @@ public class CartViewModel extends AndroidViewModel {
             @Override
             public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
                 Log.e("CartViewModel", "API Call for deleteCartItem failed: " + t.getMessage(), t);
+                _deleteSuccess.setValue(false); // Báo cáo thất bại
                 _error.setValue("Lỗi kết nối khi xóa sản phẩm: " + t.getMessage());
                 _isLoading.setValue(false);
             }
@@ -172,7 +206,6 @@ public class CartViewModel extends AndroidViewModel {
                 int currentQuantity = item.getCartItem().getQuantity();
                 Integer initialQuantity = initialQuantities.get(cartId);
 
-                // Chỉ thêm vào danh sách update nếu số lượng đã thay đổi
                 if (initialQuantity == null || currentQuantity != initialQuantity) {
                     updates.add(new UpdateCartQuantityRequest(cartId, currentQuantity));
                 }
@@ -185,11 +218,14 @@ public class CartViewModel extends AndroidViewModel {
         }
 
         _isLoading.setValue(true);
-        apiService.updateCartQuantities(updates).enqueue(new Callback<Void>() {
+        _updateSuccess.setValue(null); // Reset trạng thái trước khi gọi API
+        // GỌI PHƯƠNG THỨC TỪ Repository
+        cartRepository.updateCartQuantities(updates).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
                 if (response.isSuccessful()) {
                     Log.d("CartViewModel", "Cart quantities updated successfully.");
+                    _updateSuccess.setValue(true); // Báo cáo thành công
                     _error.setValue("Cập nhật giỏ hàng thành công!");
                     // Cập nhật lại initialQuantities sau khi update thành công
                     if (currentItems != null) {
@@ -200,7 +236,16 @@ public class CartViewModel extends AndroidViewModel {
                     }
                 } else {
                     Log.e("CartViewModel", "Failed to update cart quantities. Code: " + response.code() + ", Message: " + response.message());
-                    _error.setValue("Cập nhật giỏ hàng thất bại. Mã lỗi: " + response.code());
+                    String errorMessage = "Cập nhật giỏ hàng thất bại.";
+                    try {
+                        if (response.errorBody() != null) {
+                            errorMessage += " - " + response.errorBody().string();
+                        }
+                    } catch (Exception e) {
+                        Log.e("CartViewModel", "Error parsing error body for update: " + e.getMessage());
+                    }
+                    _updateSuccess.setValue(false); // Báo cáo thất bại
+                    _error.setValue(errorMessage);
                 }
                 _isLoading.setValue(false);
             }
@@ -208,9 +253,19 @@ public class CartViewModel extends AndroidViewModel {
             @Override
             public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
                 Log.e("CartViewModel", "API Call for updateCartQuantities failed: " + t.getMessage(), t);
+                _updateSuccess.setValue(false); // Báo cáo thất bại
                 _error.setValue("Lỗi kết nối khi cập nhật giỏ hàng: " + t.getMessage());
                 _isLoading.setValue(false);
             }
         });
+    }
+
+    // Các phương thức reset trạng thái nếu bạn sử dụng LiveData riêng cho thông báo thành công
+    public void resetDeleteStatus() {
+        _deleteSuccess.setValue(null);
+    }
+
+    public void resetUpdateStatus() {
+        _updateSuccess.setValue(null);
     }
 }

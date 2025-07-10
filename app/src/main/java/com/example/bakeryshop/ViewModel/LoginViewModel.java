@@ -66,7 +66,7 @@ public class LoginViewModel extends AndroidViewModel {
         _loginSuccess.setValue(false);
 
         // Tạo đối tượng yêu cầu đăng nhập
-        LoginRequestDTO requestDTO = new LoginRequestDTO(email, password);
+        LoginRequestDTO requestDTO = new LoginRequestDTO(email, password, "Customer");
 
         // Gọi API đăng nhập từ UserRepository
         userRepository.login(requestDTO).enqueue(new Callback<LoginResponseDTO>() {

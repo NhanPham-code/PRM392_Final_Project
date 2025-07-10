@@ -25,4 +25,8 @@ public class UserRepository {
     public Call<ReadUserDTO> register(RegisterRequestDTO request) {
         return apiService.register(request);
     }
+
+    public Call<ReadUserDTO> getUserInfo() {
+        return apiService.getUserInfo();
+    }
 }

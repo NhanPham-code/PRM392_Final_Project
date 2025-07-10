@@ -3,10 +3,12 @@ package com.example.bakeryshop.Data.DTO;
 public class LoginRequestDTO {
     private String email;
     private String password;
+    private String role;
 
-    public LoginRequestDTO(String email, String password) {
+    public LoginRequestDTO(String email, String password, String role) {
         this.email = email;
         this.password = password;
+        this.role = role;
     }
 
     public String getEmail() {
@@ -23,5 +25,13 @@ public class LoginRequestDTO {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

@@ -52,4 +52,8 @@ public interface ApiService {
     // MỚI: API để cập nhật số lượng của nhiều sản phẩm trong giỏ hàng
     @PUT("cart/update-quantities")
     Call<Void> updateCartQuantities(@Body List<UpdateCartQuantityRequest> updates); // Body là danh sách các đối tượng cần update
+
+    @GET("users/info")
+    Call<ReadUserDTO> getUserInfo(); // Lấy thông tin người dùng hiện tại
+
 }
