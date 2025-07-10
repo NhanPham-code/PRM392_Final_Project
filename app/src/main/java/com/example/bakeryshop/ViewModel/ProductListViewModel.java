@@ -39,7 +39,7 @@ public class ProductListViewModel extends AndroidViewModel {
     public ProductListViewModel(Application application) {
         super(application);
         // Initialize any necessary components here, such as repositories or services.
-        productRepository = new ProductRepository();
+        productRepository = new ProductRepository(application);
     }
 
     /**

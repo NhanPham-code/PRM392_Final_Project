@@ -1,5 +1,8 @@
 package com.example.bakeryshop.Data.Api;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
 import java.security.cert.CertificateException;
 
 import javax.net.ssl.HostnameVerifier;
@@ -9,7 +12,10 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -21,13 +27,14 @@ public class ApiClient {
     private static ApiClient instance;
     private ApiService apiService;
 
-    private ApiClient() {
+    private ApiClient(Context context) {
         // Tạo HttpLoggingInterceptor để log các yêu cầu và phản hồi (hữu ích cho việc gỡ lỗi)
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
         // Tạo OkHttpClient và thêm interceptor
-        OkHttpClient client = getUnsafeOkHttpClient(loggingInterceptor); // Sử dụng phương thức mới để lấy client không an toàn
+        AuthInterceptor authInterceptor = new AuthInterceptor(context);
+        OkHttpClient client = getUnsafeOkHttpClient(loggingInterceptor, authInterceptor); // Sử dụng phương thức mới để lấy client không an toàn
 
         // Khởi tạo Retrofit
         Retrofit retrofit = new Retrofit.Builder()
@@ -39,9 +46,9 @@ public class ApiClient {
         apiService = retrofit.create(ApiService.class);
     }
 
-    public static synchronized ApiClient getInstance() {
+    public static synchronized ApiClient getInstance(Context context) {
         if (instance == null) {
-            instance = new ApiClient();
+            instance = new ApiClient(context);
         }
         return instance;
     }
@@ -55,45 +62,27 @@ public class ApiClient {
      * CHỈ ĐƯỢC SỬ DỤNG CHO MÔI TRƯỜNG PHÁT TRIỂN/THỬ NGHIỆM!
      * KHÔNG BAO GIỜ SỬ DỤNG TRONG MÔI TRƯỜNG PRODUCTION!
      */
-    private static OkHttpClient getUnsafeOkHttpClient(HttpLoggingInterceptor loggingInterceptor) {
+    private static OkHttpClient getUnsafeOkHttpClient(HttpLoggingInterceptor loggingInterceptor, Interceptor authInterceptor) {
         try {
-            // Tạo một TrustManager chấp nhận tất cả các chứng chỉ
             final TrustManager[] trustAllCerts = new TrustManager[]{
                     new X509TrustManager() {
-                        @Override
-                        public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
-                        }
-
-                        @Override
-                        public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
-                        }
-
-                        @Override
-                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                        @Override public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {}
+                        @Override public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {}
+                        @Override public java.security.cert.X509Certificate[] getAcceptedIssuers() {
                             return new java.security.cert.X509Certificate[]{};
                         }
                     }
             };
 
-            // Cài đặt SSLContext với TrustManager đã tạo
             final SSLContext sslContext = SSLContext.getInstance("SSL");
             sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
-
-            // Tạo SSLSocketFactory từ SSLContext
             final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
 
             OkHttpClient.Builder builder = new OkHttpClient.Builder();
-            builder.addInterceptor(loggingInterceptor); // Giữ lại logging interceptor
-
-            // Gán SSLSocketFactory và HostnameVerifier cho Builder
+            builder.addInterceptor(loggingInterceptor);
+            builder.addInterceptor(authInterceptor); // ✅ GẮN INTERCEPTOR ĐÃ TẠO
             builder.sslSocketFactory(sslSocketFactory, (X509TrustManager) trustAllCerts[0]);
-            builder.hostnameVerifier(new HostnameVerifier() {
-                @Override
-                public boolean verify(String hostname, SSLSession session) {
-                    return true; // Chấp nhận tất cả hostnames
-                }
-            });
-
+            builder.hostnameVerifier((hostname, session) -> true);
             return builder.build();
         } catch (Exception e) {
             throw new RuntimeException(e);

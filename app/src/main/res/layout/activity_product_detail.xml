@@ -7,7 +7,6 @@
     android:background="@color/colorBackground"
     tools:context=".ProductDetailActivity">
 
-    <!-- ScrollView chứa toàn bộ nội dung chi tiết sản phẩm -->
     <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="0dp"
@@ -22,7 +21,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Khu vực ảnh sản phẩm (RelativeLayout để đặt nút overlay) -->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="375dp"
@@ -37,7 +35,6 @@
                     android:src="@drawable/placeholder" />
             </RelativeLayout>
 
-            <!-- Khối thông tin sản phẩm -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -92,22 +89,22 @@
                     </LinearLayout>
 
 
-                        <LinearLayout
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="end"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/detailProductPrice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:gravity="end"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:id="@+id/detailProductPrice"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/quicksand_regular"
-                                android:text="XX.XXX₫"
-                                android:textColor="@color/colorPrimaryDark"
-                                android:textSize="24sp"
-                                android:textStyle="bold" />
-                        </LinearLayout>
+                            android:fontFamily="@font/quicksand_regular"
+                            android:text="XX.XXX₫"
+                            android:textColor="@color/colorPrimaryDark"
+                            android:textSize="24sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
 
                 </LinearLayout>
 
@@ -165,7 +162,6 @@
 
     </ScrollView>
 
-    <!-- Nút Back tinh tế ở góc trái trên cùng -->
     <ImageButton
         android:id="@+id/backButton"
         android:layout_width="48dp"
@@ -184,7 +180,6 @@
         app:tint="@color/colorTextPrimary" />
 
 
-    <!-- Thanh hành động dưới cùng -->
     <LinearLayout
         android:id="@+id/bottomActionBar"
         android:layout_width="match_parent"
@@ -259,9 +254,8 @@
 
             <Button
                 android:id="@+id/addToCartButton"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:layout_weight="1"
                 android:background="@drawable/button_outline_primary"
                 android:fontFamily="@font/quicksand_regular"
                 android:text="Thêm vào giỏ hàng"
@@ -271,19 +265,6 @@
                 app:icon="@drawable/ic_cart"
                 app:iconGravity="textStart"
                 app:iconTint="@color/colorPrimary" />
-
-            <Button
-                android:id="@+id/buyNowButton"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_marginStart="12dp"
-                android:layout_weight="1"
-                android:background="@drawable/button_background_primary"
-                android:fontFamily="@font/quicksand_regular"
-                android:text="Mua ngay"
-                android:textAllCaps="false"
-                android:textColor="@android:color/white"
-                android:textSize="16sp" />
 
         </LinearLayout>
 

@@ -1,66 +1,123 @@
 package com.example.bakeryshop.Fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
-import com.example.bakeryshop.R;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link CartFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class CartFragment extends Fragment {
+import com.example.bakeryshop.Adapters.CartAdapter;
+import com.example.bakeryshop.Data.DTO.CartDisplayItem;
+import com.example.bakeryshop.ViewModel.CartViewModel;
+import com.example.bakeryshop.databinding.FragmentCartBinding;
+import com.google.android.material.button.MaterialButton; // MỚI: Import MaterialButton
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+import java.util.ArrayList;
+import java.util.List;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+public class CartFragment extends Fragment implements CartAdapter.OnCartItemActionListener { // Triển khai interface
+
+    private FragmentCartBinding binding;
+    private CartViewModel cartViewModel;
+    private CartAdapter cartAdapter;
+
+    // Danh sách để lưu trữ các CartDisplayItem đã được chọn để thanh toán
+    private List<CartDisplayItem> selectedItemsForCheckout = new ArrayList<>();
 
     public CartFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment CartFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static CartFragment newInstance(String param1, String param2) {
-        CartFragment fragment = new CartFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_cart, container, false);
+        binding = FragmentCartBinding.inflate(inflater, container, false);
+
+        cartViewModel = new ViewModelProvider(this).get(CartViewModel.class);
+        cartAdapter = new CartAdapter();
+        cartAdapter.setOnCartItemActionListener(this); // Thiết lập listener cho Adapter
+
+        binding.recyclerCart.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.recyclerCart.setAdapter(cartAdapter);
+
+        cartViewModel.cartItems.observe(getViewLifecycleOwner(), items -> {
+            cartAdapter.setItems(items);
+            // Sau khi danh sách giỏ hàng được cập nhật, đảm bảo selectedItemsForCheckout cũng được đồng bộ
+            // Ví dụ: loại bỏ các item không còn tồn tại trong giỏ hàng, hoặc cập nhật lại trạng thái chọn
+            // Đơn giản nhất là xóa và thêm lại các item đã chọn
+            // (Tuy nhiên, cách tốt hơn là duyệt qua và giữ lại trạng thái đã chọn nếu item vẫn còn)
+            // Tạm thời, để đơn giản, chúng ta sẽ làm lại logic chọn khi cần.
+        });
+
+        cartViewModel.isLoading.observe(getViewLifecycleOwner(), isLoading -> {
+            binding.progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+            binding.recyclerCart.setVisibility(isLoading ? View.GONE : View.VISIBLE);
+        });
+
+        cartViewModel.error.observe(getViewLifecycleOwner(), errorMsg -> {
+            if (errorMsg != null && !errorMsg.isEmpty()) {
+                Toast.makeText(getContext(), "Thông báo: " + errorMsg, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        cartViewModel.fetchCartItems();
+
+        // Xử lý sự kiện cho nút "Update Cart" (mới)
+        binding.btnUpdateCart.setOnClickListener(v -> {
+            cartViewModel.updateAllCartQuantities();
+        });
+
+        // Xử lý sự kiện cho nút "Thanh toán các món đã chọn" (mới)
+        binding.btnCheckoutSelected.setOnClickListener(v -> {
+            if (selectedItemsForCheckout.isEmpty()) {
+                Toast.makeText(getContext(), "Vui lòng chọn ít nhất một sản phẩm để thanh toán.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            // TODO: Chuyển sang Activity thanh toán và truyền danh sách selectedItemsForCheckout đi
+            // Ví dụ: Intent intent = new Intent(getActivity(), CheckoutActivity.class);
+            // intent.putExtra("selected_items", (ArrayList<CartDisplayItem>) selectedItemsForCheckout); // Cần CartDisplayItem implements Serializable hoặc Parcelable
+            // startActivity(intent);
+            Toast.makeText(getContext(), "Chuyển sang màn hình thanh toán với " + selectedItemsForCheckout.size() + " sản phẩm đã chọn.", Toast.LENGTH_SHORT).show();
+        });
+
+        return binding.getRoot();
     }
+
+    //region Implement CartAdapter.OnCartItemActionListener
+    @Override
+    public void onIncreaseQuantity(CartDisplayItem item) {
+        cartViewModel.updateQuantityLocally(item, 1);
+    }
+
+    @Override
+    public void onDecreaseQuantity(CartDisplayItem item) {
+        cartViewModel.updateQuantityLocally(item, -1);
+    }
+
+    @Override
+    public void onDeleteItem(CartDisplayItem item) {
+        cartViewModel.deleteCartItem(item);
+    }
+
+    @Override
+    public void onItemSelected(CartDisplayItem item, boolean isChecked) {
+        if (isChecked) {
+            if (!selectedItemsForCheckout.contains(item)) {
+                selectedItemsForCheckout.add(item);
+            }
+        } else {
+            selectedItemsForCheckout.remove(item);
+        }
+        Log.d("CartFragment", "Selected items count: " + selectedItemsForCheckout.size());
+        // Có thể cập nhật UI, ví dụ: kích hoạt/vô hiệu hóa nút thanh toán
+        binding.btnCheckoutSelected.setEnabled(!selectedItemsForCheckout.isEmpty());
+    }
+    //endregion
 }

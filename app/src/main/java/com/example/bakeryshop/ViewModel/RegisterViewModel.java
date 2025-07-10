@@ -30,7 +30,7 @@ public class RegisterViewModel extends AndroidViewModel {
     public RegisterViewModel(Application application) {
         super(application);
         // Initialize any necessary components here
-        this.userRepository = new UserRepository();
+        this.userRepository = new UserRepository(application);
     }
 
     public void register(String fullName, String email, String password, String address, String phoneNumber) {
