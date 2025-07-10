@@ -6,31 +6,31 @@ import java.util.Date;
 
 public class ReadUserDTO {
 
-    @SerializedName("UserId")
+    @SerializedName("userId")
     private int userId;
 
-    @SerializedName("FullName")
+    @SerializedName("fullName")
     private String fullName;
 
-    @SerializedName("Email")
+    @SerializedName("email")
     private String email;
 
-    @SerializedName("Role")
+    @SerializedName("role")
     private String role;
 
-    @SerializedName("Address")
+    @SerializedName("address")
     private String address;
 
-    @SerializedName("PhoneNumber")
+    @SerializedName("phoneNumber")
     private String phoneNumber;
 
-    @SerializedName("RegistrationDate")
-    private Date registrationDate;
+    @SerializedName("registrationDate")
+    private String registrationDate;
 
     public ReadUserDTO() {
     }
 
-    public ReadUserDTO(int userId, String fullName, String email, String role, String address, String phoneNumber, Date registrationDate) {
+    public ReadUserDTO(int userId, String fullName, String email, String role, String address, String phoneNumber, String registrationDate) {
         this.userId = userId;
         this.fullName = fullName;
         this.email = email;
@@ -88,11 +88,11 @@ public class ReadUserDTO {
         this.phoneNumber = phoneNumber;
     }
 
-    public Date getRegistrationDate() {
+    public String getRegistrationDate() {
         return registrationDate;
     }
 
-    public void setRegistrationDate(Date registrationDate) {
+    public void setRegistrationDate(String registrationDate) {
         this.registrationDate = registrationDate;
     }
 }
