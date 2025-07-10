@@ -25,4 +25,6 @@
     <color name="bakery_light_brown">#D2B48C</color>
     <color name="bakery_warm_white">#FFFEF7</color>
     <color name="badge_red">#FF4444</color>
+    <color name="holo_red_dark">#FFCC0000</color>
+
 </resources>

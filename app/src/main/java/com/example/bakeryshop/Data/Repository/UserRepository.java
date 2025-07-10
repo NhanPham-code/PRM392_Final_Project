@@ -1,5 +1,7 @@
 package com.example.bakeryshop.Data.Repository;
 
+import android.content.Context;
+
 import com.example.bakeryshop.Data.Api.ApiClient;
 import com.example.bakeryshop.Data.Api.ApiService;
 import com.example.bakeryshop.Data.DTO.LoginRequestDTO;
@@ -12,8 +14,8 @@ import retrofit2.Call;
 public class UserRepository {
     private final ApiService apiService;
 
-    public UserRepository() {
-        this.apiService = ApiClient.getInstance().getApiService();
+    public UserRepository(Context context) {
+        this.apiService = ApiClient.getInstance(context).getApiService();
     }
 
     public Call<LoginResponseDTO> login(LoginRequestDTO request) {

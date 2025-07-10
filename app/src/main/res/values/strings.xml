@@ -4,4 +4,22 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="navigation_drawer_open">open drawer layout\n</string>
     <string name="navigation_drawer_close">close drawer layout</string>
+
+    <string name="cart_title">Giỏ hàng của bạn</string>
+    <string name="checkout_button_text">Thanh toán</string>
+    <string name="total_label">Tổng cộng:</string>
+    <string name="default_total_price">0 đ</string>
+    <string name="cart_items_list_description">Danh sách sản phẩm trong giỏ hàng</string>
+
+
+    <string name="product_image_description"> Ảnh sẽ hiện ở đây </string>
+    <string name="sample_product_name">Tên sản phẩm</string>
+    <string name="sample_product_price">Giá sản phẩm</string>
+    <string name="sample_quantity">Số lượng</string>
+    <string name="decrease_quantity_button">Giảm</string>
+    <string name="increase_quantity_button">Tăng</string>
+    <string name="delete_item_button">Xóa</string>
+
+    <string name="update_cart_button_text">Cập nhật Giỏ hàng</string>
+    <string name="checkout_selected_button_text">Thanh toán các món đã chọn</string>
 </resources>
