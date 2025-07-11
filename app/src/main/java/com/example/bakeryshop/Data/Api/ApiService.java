@@ -8,6 +8,7 @@ import com.example.bakeryshop.Data.DTO.ReadProductDTO;
 import com.example.bakeryshop.Data.DTO.ReadUserDTO;
 import com.example.bakeryshop.Data.DTO.RegisterRequestDTO;
 import com.example.bakeryshop.Data.DTO.UpdateCartQuantityRequest;
+import com.example.bakeryshop.Data.DTO.UpdateUserProfileDTO;
 
 import java.util.List;
 
@@ -55,5 +56,8 @@ public interface ApiService {
 
     @GET("users/info")
     Call<ReadUserDTO> getUserInfo(); // Lấy thông tin người dùng hiện tại
+
+    @PUT("users/update-profile")
+    Call<Void> updateUserProfile(@Body UpdateUserProfileDTO userProfileDTO); // Cập nhật thông tin người dùng
 
 }
