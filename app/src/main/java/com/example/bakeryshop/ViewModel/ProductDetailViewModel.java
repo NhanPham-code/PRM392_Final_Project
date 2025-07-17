@@ -11,6 +11,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.bakeryshop.Data.DTO.AddCartItemRequestDTO; // MỚI
 import com.example.bakeryshop.Data.DTO.ReadProductDTO;
+import com.example.bakeryshop.Data.Repository.CartRepository;
 import com.example.bakeryshop.Data.Repository.ProductRepository;
 import com.example.bakeryshop.Data.Api.ApiService; // MỚI
 import com.example.bakeryshop.Data.Api.ApiClient; // MỚI
@@ -26,7 +27,7 @@ public class ProductDetailViewModel extends AndroidViewModel {
     private static final String TAG = "ProductDetailViewModel";
 
     private final ProductRepository productRepository;
-    private final ApiService apiService; // MỚI: Thêm ApiService
+    private final CartRepository cartRepository;
     private final SharedPreferences sharedPreferences;
 
     private final MutableLiveData<ReadProductDTO> _productSuccess = new MutableLiveData<>();
@@ -55,7 +56,7 @@ public class ProductDetailViewModel extends AndroidViewModel {
     public ProductDetailViewModel(@NonNull Application application){
         super(application);
         this.productRepository = new ProductRepository(application);
-        this.apiService = ApiClient.getInstance(application).getApiService(); // Khởi tạo ApiService
+        this.cartRepository = new CartRepository(application);
         this.sharedPreferences = application.getSharedPreferences(PREFS_NAME, Application.MODE_PRIVATE);
     }
 
@@ -114,7 +115,7 @@ public class ProductDetailViewModel extends AndroidViewModel {
         clearErrorMessage();
         Log.d(TAG, "Bắt đầu tải sản phẩm theo Category ID: " + categoryId);
 
-        apiService.getProductsByCategoryId(categoryId).enqueue(new Callback<List<ReadProductDTO>>() {
+        productRepository.getProductsByCategoryId(categoryId).enqueue(new Callback<List<ReadProductDTO>>() {
             @Override
             public void onResponse(@NonNull Call<List<ReadProductDTO>> call, @NonNull Response<List<ReadProductDTO>> response) {
                 _productLoading.setValue(false);
@@ -157,7 +158,7 @@ public class ProductDetailViewModel extends AndroidViewModel {
 
         AddCartItemRequestDTO request = new AddCartItemRequestDTO(productId, quantity);
 
-        apiService.addItemToCart(request).enqueue(new Callback<Void>() {
+        cartRepository.addItemToCart(request).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
                 _productLoading.setValue(false); // Ẩn loading

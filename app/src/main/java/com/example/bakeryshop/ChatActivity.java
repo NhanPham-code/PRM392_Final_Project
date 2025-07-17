@@ -8,7 +8,11 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+import com.example.bakeryshop.ViewModel.ProfileViewModel;
+import com.example.bakeryshop.Data.DTO.ReadUserDTO;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -90,42 +94,89 @@ public class ChatActivity extends AppCompatActivity {
     private ScrollView scrollView;
     private final String ADMIN_ID = "admin";
 
+    // ViewModel để lấy thông tin user
+    private ProfileViewModel profileViewModel;
+    private ReadUserDTO userProfile;
+
+    // UI components
+    private EditText input;
+    private Button sendBtn;
+    private LinearLayout chatLayout;
+    private TextView headerText;
+    private Button backBtn;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
-        // Lấy thông tin user từ SharedPreferences hoặc Intent
-        // Ví dụ: currentUserId = "user123", currentUserName = "John Doe"
-        currentUserId = getIntent().getStringExtra("user_id");
-        currentUserName = getIntent().getStringExtra("user_name");
-
-        // Fallback nếu không có thông tin
-        if (currentUserId == null || currentUserId.isEmpty()) {
-            currentUserId = "user" + System.currentTimeMillis(); // Tạo ID unique
-        }
-        if (currentUserName == null || currentUserName.isEmpty()) {
-            currentUserName = "User " + currentUserId;
-        }
+        // Khởi tạo ViewModel
+        profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
 
         // Khởi tạo các view
-        EditText input = findViewById(R.id.msgInput);
-        Button sendBtn = findViewById(R.id.sendBtn);
-        LinearLayout chatLayout = findViewById(R.id.chatLayout);
-        TextView headerText = findViewById(R.id.headerText);
-        Button backBtn = findViewById(R.id.backBtn);
+        initViews();
+
+        // Lấy thông tin user từ ViewModel
+        loadUserProfile();
+
+        // Observe profile data
+        observeProfileData();
+    }
+
+    private void initViews() {
+        input = findViewById(R.id.msgInput);
+        sendBtn = findViewById(R.id.sendBtn);
+        chatLayout = findViewById(R.id.chatLayout);
+        headerText = findViewById(R.id.headerText);
+        backBtn = findViewById(R.id.backBtn);
         scrollView = findViewById(R.id.scrollView);
 
         // Set header title
         headerText.setText("Chat với Admin");
 
         // Xử lý nút quay lại
-        backBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
+        backBtn.setOnClickListener(v -> finish());
+    }
+
+    private void loadUserProfile() {
+        // Fetch user profile từ ViewModel
+        profileViewModel.fetchUserProfile();
+    }
+
+    private void observeProfileData() {
+        // Observe thành công
+        profileViewModel.getProfileSuccess.observe(this, user -> {
+            if (user != null) {
+                userProfile = user;
+                currentUserId = String.valueOf(user.getUserId()); // Chuyển từ int sang String
+                currentUserName = user.getFullName();
+
+                // Sau khi có thông tin user, khởi tạo chat
+                initializeChat();
             }
         });
+
+        // Observe lỗi (nếu ViewModel có)
+        // profileViewModel.getProfileError.observe(this, error -> {
+        //     Toast.makeText(this, "Không thể tải thông tin user: " + error, Toast.LENGTH_SHORT).show();
+        //     // Sử dụng thông tin fallback
+        //     useFallbackUserInfo();
+        // });
+    }
+
+    private void useFallbackUserInfo() {
+        // Fallback nếu không lấy được thông tin từ ViewModel
+        currentUserId = "user" + System.currentTimeMillis();
+        currentUserName = "User " + currentUserId;
+        initializeChat();
+    }
+
+    private void initializeChat() {
+        // Kiểm tra thông tin user
+        if (currentUserId == null || currentUserId.isEmpty()) {
+            useFallbackUserInfo();
+            return;
+        }
 
         // Tạo roomId (sắp xếp để đảm bảo cùng 1 room với admin)
         if (currentUserId.compareTo(ADMIN_ID) < 0) {
@@ -138,14 +189,11 @@ public class ChatActivity extends AppCompatActivity {
         dbRef = FirebaseDatabase.getInstance().getReference("chatrooms").child(roomId);
 
         // Xử lý gửi tin nhắn
-        sendBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String text = input.getText().toString().trim();
-                if (!text.isEmpty()) {
-                    sendMessage(text);
-                    input.setText("");
-                }
+        sendBtn.setOnClickListener(v -> {
+            String text = input.getText().toString().trim();
+            if (!text.isEmpty()) {
+                sendMessage(text);
+                input.setText("");
             }
         });
 
@@ -163,7 +211,7 @@ public class ChatActivity extends AppCompatActivity {
                         updateUserInList(text);
                     })
                     .addOnFailureListener(e -> {
-                        // Xử lý lỗi nếu cần
+                        Toast.makeText(this, "Không thể gửi tin nhắn", Toast.LENGTH_SHORT).show();
                     });
         }
     }
@@ -216,19 +264,14 @@ public class ChatActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(DatabaseError error) {
-                // Xử lý lỗi nếu cần
+                Toast.makeText(ChatActivity.this, "Lỗi khi tải tin nhắn", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void scrollToBottom() {
         // Scroll xuống cuối sau khi messages được load
-        scrollView.post(new Runnable() {
-            @Override
-            public void run() {
-                scrollView.fullScroll(View.FOCUS_DOWN);
-            }
-        });
+        scrollView.post(() -> scrollView.fullScroll(View.FOCUS_DOWN));
     }
 
     private void displayMessage(UserMessage msg, LinearLayout chatLayout) {

@@ -19,7 +19,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Địa chỉ giao hàng"
+            android:text="Chọn địa chỉ giao hàng"
             android:textColor="@android:color/black"
             android:textSize="16sp"
             android:textStyle="bold"
@@ -37,11 +37,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:background="@drawable/address_input_background"
-                android:hint="Nhập địa chỉ của bạn"
+                android:hint="Nhập địa chỉ của bạn hoặc chọn trên bản đồ"
                 android:paddingStart="16dp"
                 android:paddingEnd="50dp"
                 android:textSize="14sp"
-                android:maxLines="1"
+                android:maxLines="2"
                 android:inputType="textPostalAddress" />
 
             <!-- Icon vị trí hiện tại trong ô nhập -->
@@ -56,7 +56,6 @@
                 android:src="@drawable/ic_my_location"
                 android:contentDescription="Sử dụng vị trí hiện tại"
                 android:scaleType="centerInside" />
-
         </RelativeLayout>
 
         <!-- Container cho các nút -->
@@ -81,7 +80,7 @@
                 android:drawablePadding="4dp"
                 android:gravity="center" />
 
-            <!-- Nút tìm kiếm -->
+            <!-- Nút xác nhận (thay đổi từ nút tìm kiếm) -->
             <Button
                 android:id="@+id/buttonSearch"
                 android:layout_width="0dp"
@@ -89,15 +88,24 @@
                 android:layout_weight="1"
                 android:layout_marginStart="8dp"
                 android:background="@drawable/button_search_background"
-                android:text="Tìm kiếm"
+                android:text="Xác nhận"
                 android:textColor="@android:color/white"
                 android:textSize="12sp"
-                android:drawableStart="@drawable/ic_search"
+                android:drawableStart="@drawable/ic_check"
                 android:drawablePadding="4dp"
                 android:gravity="center" />
-
         </LinearLayout>
 
+        <!-- Hướng dẫn sử dụng (nếu cần thêm text ở đây thì bỏ comment ra) -->
+        <!--
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Chạm vào bản đồ để chọn vị trí"
+            android:textSize="12sp"
+            android:textColor="@android:color/darker_gray"
+            android:layout_marginTop="8dp" />
+        -->
     </LinearLayout>
 
     <!-- Bản đồ -->

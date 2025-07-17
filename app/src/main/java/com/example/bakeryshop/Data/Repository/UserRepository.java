@@ -8,6 +8,7 @@ import com.example.bakeryshop.Data.DTO.LoginRequestDTO;
 import com.example.bakeryshop.Data.DTO.LoginResponseDTO;
 import com.example.bakeryshop.Data.DTO.ReadUserDTO;
 import com.example.bakeryshop.Data.DTO.RegisterRequestDTO;
+import com.example.bakeryshop.Data.DTO.UpdateUserProfileDTO;
 
 import retrofit2.Call;
 
@@ -28,5 +29,9 @@ public class UserRepository {
 
     public Call<ReadUserDTO> getUserInfo() {
         return apiService.getUserInfo();
+    }
+
+    public Call<Void> updateUserProfile(UpdateUserProfileDTO updateUserProfileDTO) {
+        return apiService.updateUserProfile(updateUserProfileDTO);
     }
 }

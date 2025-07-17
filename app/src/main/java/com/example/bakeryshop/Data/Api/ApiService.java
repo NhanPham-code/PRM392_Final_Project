@@ -2,12 +2,16 @@ package com.example.bakeryshop.Data.Api;
 
 import com.example.bakeryshop.Data.DTO.AddCartItemRequestDTO;
 import com.example.bakeryshop.Data.DTO.CartItemDTO;
+import com.example.bakeryshop.Data.DTO.CreateOrderDTO;
+import com.example.bakeryshop.Data.DTO.CreateOrderDetailDTO;
 import com.example.bakeryshop.Data.DTO.LoginRequestDTO;
 import com.example.bakeryshop.Data.DTO.LoginResponseDTO;
+import com.example.bakeryshop.Data.DTO.ReadOrderDTO;
 import com.example.bakeryshop.Data.DTO.ReadProductDTO;
 import com.example.bakeryshop.Data.DTO.ReadUserDTO;
 import com.example.bakeryshop.Data.DTO.RegisterRequestDTO;
 import com.example.bakeryshop.Data.DTO.UpdateCartQuantityRequest;
+import com.example.bakeryshop.Data.DTO.UpdateUserProfileDTO;
 
 import java.util.List;
 
@@ -53,7 +57,17 @@ public interface ApiService {
     @PUT("cart/update-quantities")
     Call<Void> updateCartQuantities(@Body List<UpdateCartQuantityRequest> updates); // Body là danh sách các đối tượng cần update
 
+    @POST("/OrderHistory/add")
+    Call<ReadOrderDTO> createOrder(@Body CreateOrderDTO order);
+
+    @POST("/OrderDetails/create")
+    Call<Void> createOrderDetail(@Body CreateOrderDetailDTO orderDetail);
+
+
     @GET("users/info")
     Call<ReadUserDTO> getUserInfo(); // Lấy thông tin người dùng hiện tại
+
+    @PUT("users/update-profile")
+    Call<Void> updateUserProfile(@Body UpdateUserProfileDTO userProfileDTO); // Cập nhật thông tin người dùng
 
 }

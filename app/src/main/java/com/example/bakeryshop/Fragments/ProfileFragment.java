@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -15,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.bakeryshop.Data.DTO.ReadUserDTO;
+import com.example.bakeryshop.Data.DTO.UpdateUserProfileDTO;
 import com.example.bakeryshop.LoginActivity;
 import com.example.bakeryshop.R;
 import com.example.bakeryshop.ViewModel.ProfileViewModel;
@@ -52,7 +54,7 @@ public class ProfileFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = FragmentProfileBinding.inflate(inflater, container, false);
@@ -70,6 +72,31 @@ public class ProfileFragment extends Fragment {
             // Update UI with user data
             userProfile = user; // Save the user profile data
             binding.tvUserName.setText(user.getFullName());
+        });
+
+        // Observe loading state
+        profileViewModel.isLoading.observe(getViewLifecycleOwner(), isLoading -> {
+            if (isLoading) {
+                binding.progressBar.setVisibility(View.VISIBLE); // Show progress bar
+            } else {
+                binding.progressBar.setVisibility(View.GONE); // Hide progress bar
+            }
+        });
+
+        // Observe error messages
+        profileViewModel.errorMessage.observe(getViewLifecycleOwner(), errorMessage -> {
+            if (errorMessage != null && !errorMessage.isEmpty()) {
+                Toast.makeText(getContext(), errorMessage, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Observe update profile success
+        profileViewModel.updateProfileSuccess.observe(getViewLifecycleOwner(), isSuccess -> {
+            if (isSuccess) {
+                Toast.makeText(getContext(), "Profile updated successfully!", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getContext(), "Failed to update profile.", Toast.LENGTH_SHORT).show();
+            }
         });
 
         // logout
@@ -139,7 +166,6 @@ public class ProfileFragment extends Fragment {
                 .setView(dialogView)              // Gán view tùy chỉnh
                 .setPositiveButton("Save", (d, w) -> {
                     savePersonalInfo(dialogView); // Hàm xử lý lưu thông tin
-                    Toast.makeText(getContext(), "Personal information updated successfully!", Toast.LENGTH_SHORT).show();
                 })
                 .setNegativeButton("Cancel", null) // Nút Hủy, không làm gì khi bấm
                 .create();
@@ -165,6 +191,46 @@ public class ProfileFragment extends Fragment {
     }
 
     private void savePersonalInfo(View dialogView) {
+        TextInputEditText etFullName = dialogView.findViewById(R.id.etFullName);
+        TextInputEditText etEmail = dialogView.findViewById(R.id.etEmail);
+        TextInputEditText etPhoneNumber = dialogView.findViewById(R.id.etPhone);
+        TextInputEditText etAddress = dialogView.findViewById(R.id.etAddress);
+        TextInputEditText etRegistrationDate = dialogView.findViewById(R.id.etRegistrationDate);
+
+        // Lấy dữ liệu từ các trường nhập liệu
+        String fullName = etFullName.getText().toString().trim();
+        String email = etEmail.getText().toString().trim();
+        String phoneNumber = etPhoneNumber.getText().toString().trim();
+        String address = etAddress.getText().toString().trim();
+
+
+        // Kiểm tra và cập nhật thông tin người dùng
+        if (!fullName.isEmpty() && !email.isEmpty() && !phoneNumber.isEmpty() && !address.isEmpty()) {
+            // Cập nhật thông tin người dùng trong ViewModel
+            userProfile.setFullName(fullName);
+            userProfile.setEmail(email);
+            userProfile.setPhoneNumber(phoneNumber);
+            userProfile.setAddress(address);
+
+            // Set userProfile in ViewModel using MutableLivedata to trigger UI update
+            profileViewModel.setUserProfile(userProfile);
+
+            // Tạo đối tượng DTO để cập nhật thông tin người dùng
+            UpdateUserProfileDTO updateUserProfileDTO = new UpdateUserProfileDTO(
+                    userProfile.getUserId(),
+                    fullName,
+                    email,
+                    userProfile.getRole(),
+                    phoneNumber,
+                    address
+            );
+
+            // Gọi phương thức cập nhật trong ViewModel to update user profile to server by calling API
+            profileViewModel.updateUserProfile(updateUserProfileDTO);
+        } else {
+            // Hiển thị thông báo lỗi nếu có trường nào đó trống
+            Toast.makeText(getContext(), "Please fill in all fields!", Toast.LENGTH_SHORT).show();
+        }
     }
 
 

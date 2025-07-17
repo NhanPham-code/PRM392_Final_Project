@@ -15,6 +15,7 @@ import com.example.bakeryshop.Data.DTO.CartItemDTO;
 import com.example.bakeryshop.Data.DTO.ReadProductDTO;
 import com.example.bakeryshop.Data.DTO.UpdateCartQuantityRequest;
 import com.example.bakeryshop.Data.Repository.CartRepository; // MỚI: Import CartRepository
+import com.example.bakeryshop.Data.Repository.ProductRepository;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,6 +31,7 @@ public class CartViewModel extends AndroidViewModel {
     // THAY THẾ ApiService BẰNG CartRepository
     private final CartRepository cartRepository; // Đổi từ ApiService sang CartRepository
 
+    private final ProductRepository productRepository;
     private final MutableLiveData<List<CartDisplayItem>> _cartItems = new MutableLiveData<>();
     public LiveData<List<CartDisplayItem>> cartItems = _cartItems;
 
@@ -53,12 +55,13 @@ public class CartViewModel extends AndroidViewModel {
         super(application);
         // KHỞI TẠO CartRepository thay vì ApiService
         cartRepository = new CartRepository(application.getApplicationContext());
+        productRepository = new ProductRepository(application.getApplicationContext());
     }
 
     public void fetchCartItems() {
         _isLoading.setValue(true);
         // GỌI PHƯƠNG THỨC TỪ Repository
-        cartRepository.getCartByUser().enqueue(new Callback<List<CartItemDTO>>() {
+        cartRepository.getCartUser().enqueue(new Callback<List<CartItemDTO>>() {
             @Override
             public void onResponse(@NonNull Call<List<CartItemDTO>> call, @NonNull Response<List<CartItemDTO>> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -104,7 +107,7 @@ public class CartViewModel extends AndroidViewModel {
 
     private void fetchProductDetails(CartItemDTO cartItem, List<CartDisplayItem> displayItems, int totalCartItems, int[] fetchedProductsCount) {
         // GỌI PHƯƠNG THỨC TỪ Repository
-        cartRepository.getProductById(cartItem.getProductID()).enqueue(new Callback<ReadProductDTO>() {
+        productRepository.getProductById(cartItem.getProductID()).enqueue(new Callback<ReadProductDTO>() {
             @Override
             public void onResponse(@NonNull Call<ReadProductDTO> call, @NonNull Response<ReadProductDTO> response) {
                 synchronized (fetchedProductsCount) {

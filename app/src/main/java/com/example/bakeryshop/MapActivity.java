@@ -1,8 +1,7 @@
 package com.example.bakeryshop;
 
-
-
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -61,7 +60,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     // UI Components
     private EditText editTextAddress;
     private Button buttonUseCurrentLocation;
-    private Button buttonSearch;
+    private Button buttonConfirm; // Đổi từ buttonSearch thành buttonConfirm
     private ImageButton buttonCurrentLocationIcon;
 
     @Override
@@ -73,12 +72,20 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         initLocationServices();
         initMap();
         setupClickListeners();
+
+        // Nhận địa chỉ hiện tại từ CheckoutActivity (nếu có)
+        String currentAddress = getIntent().getStringExtra("current_address");
+        if (currentAddress != null && !currentAddress.isEmpty()) {
+            editTextAddress.setText(currentAddress);
+            // Tìm kiếm địa chỉ này trên bản đồ
+            searchAddress(currentAddress);
+        }
     }
 
     private void initUI() {
         editTextAddress = findViewById(R.id.editTextAddress);
         buttonUseCurrentLocation = findViewById(R.id.buttonUseCurrentLocation);
-        buttonSearch = findViewById(R.id.buttonSearch);
+        buttonConfirm = findViewById(R.id.buttonSearch); // Sử dụng ID cũ nhưng đổi tên biến
         buttonCurrentLocationIcon = findViewById(R.id.buttonCurrentLocationIcon);
     }
 
@@ -110,14 +117,26 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         buttonCurrentLocationIcon.setOnClickListener(v -> getCurrentLocationAndFillAddress());
 
-        buttonSearch.setOnClickListener(v -> {
+        // Đổi chức năng từ search thành confirm
+        buttonConfirm.setOnClickListener(v -> {
             String address = editTextAddress.getText().toString().trim();
             if (!address.isEmpty()) {
-                searchAddress(address);
+                confirmAddressSelection(address);
             } else {
                 showToast("Vui lòng nhập địa chỉ");
             }
         });
+
+        // Cho phép click vào map để chọn vị trí
+        // Map click listener sẽ được thiết lập trong onMapReady
+    }
+
+    private void confirmAddressSelection(String address) {
+        // Trả về địa chỉ đã chọn cho CheckoutActivity
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra("selected_address", address);
+        setResult(RESULT_OK, resultIntent);
+        finish();
     }
 
     @Override
@@ -125,6 +144,18 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mMap = googleMap;
         setupMap();
         showDefaultLocation();
+
+        // Thêm map click listener để cho phép chọn vị trí bằng cách click vào map
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                // Cập nhật marker trên map
+                updateMapWithLocation(latLng, "Vị trí đã chọn");
+
+                // Lấy địa chỉ từ tọa độ
+                getAddressFromLocation(latLng.latitude, latLng.longitude);
+            }
+        });
     }
 
     private void setupMap() {
