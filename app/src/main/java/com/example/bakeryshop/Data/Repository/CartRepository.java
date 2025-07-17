@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.example.bakeryshop.Data.Api.ApiClient;
 import com.example.bakeryshop.Data.Api.ApiService;
+import com.example.bakeryshop.Data.DTO.AddCartItemRequestDTO;
 import com.example.bakeryshop.Data.DTO.CartItemDTO;
 import com.example.bakeryshop.Data.DTO.ReadProductDTO;
 import com.example.bakeryshop.Data.DTO.UpdateCartQuantityRequest; // MỚI: Import DTO này
@@ -19,23 +20,19 @@ public class CartRepository {
         this.apiService = ApiClient.getInstance(context).getApiService();
     }
 
-    // READ
-    public Call<List<CartItemDTO>> getCartByUser() {
+    public Call<List<CartItemDTO>> getCartUser() {
         return apiService.getCartByToken();
     }
 
-    // READ (cho chi tiết sản phẩm trong giỏ hàng)
-    public Call<ReadProductDTO> getProductById(int productId) {
-        return apiService.getProductById(productId);
-    }
-
-    // DELETE
     public Call<Void> deleteCartItem(int cartId) {
         return apiService.deleteCartItem(cartId);
     }
 
-    // UPDATE
     public Call<Void> updateCartQuantities(List<UpdateCartQuantityRequest> updates) {
-        return apiService.updateCartQuantities(updates);
+        return  apiService.updateCartQuantities(updates);
+    }
+
+    public Call<Void> addItemToCart(AddCartItemRequestDTO request) {
+        return apiService.addItemToCart(request);
     }
 }

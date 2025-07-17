@@ -15,6 +15,9 @@
         android:theme="@style/Theme.BakeryShop"
         tools:targetApi="31">
         <activity
+            android:name=".CheckoutActivity"
+            android:exported="false" />
+        <activity
             android:name=".ProductDetailActivity"
             android:exported="false" />
         <activity
