@@ -1,6 +1,7 @@
 package com.example.bakeryshop.ViewModel;
 
 import android.content.Context;
+import android.content.Intent;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -45,8 +46,8 @@ public class CheckoutViewModel extends ViewModel {
                     orderSuccess.postValue(false);
                     return;
                 }
-
-                int orderId = response.body().getOrderID();
+                ReadOrderDTO order = response.body();
+                int orderId = order.getOrderID();
                 int totalItems = cartItems.size();
                 int[] completed = {0};
                 boolean[] hasError = {false};
@@ -60,7 +61,7 @@ public class CheckoutViewModel extends ViewModel {
                             item.getProduct().getPrice() * item.getCartItem().getQuantity()
                     );
 
-                    orderRepository.createOrderDetail(detail).enqueue(new Callback<Void>() {
+                     orderRepository.createOrderDetail(detail).enqueue(new Callback<Void>() {
                         @Override
                         public void onResponse(Call<Void> call, Response<Void> response) {
                             if (!response.isSuccessful()) {

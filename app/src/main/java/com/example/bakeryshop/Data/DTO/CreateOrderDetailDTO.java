@@ -10,7 +10,7 @@ public class CreateOrderDetailDTO {
     private int productID;
     @SerializedName("quantity")
     private int quantity;
-    @SerializedName("price")
+    @SerializedName("unitPrice")
     private double price;
     @SerializedName("subtotal")
     private double subtotal;

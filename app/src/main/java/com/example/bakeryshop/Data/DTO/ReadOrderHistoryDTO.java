@@ -6,38 +6,38 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class ReadOrderDTO implements Serializable {
-    @SerializedName("orderID")
+public class ReadOrderHistoryDTO implements Serializable {
+    @SerializedName("OrderID")
     public int orderID;
 
-    @SerializedName("userID")
+    @SerializedName("UserID")
     public int userID;
 
-    @SerializedName("orderDate")
+    @SerializedName("OrderDate")
     public Date orderDate;
 
-    @SerializedName("totalAmount")
+    @SerializedName("TotalAmount")
     public double totalAmount;
 
-    @SerializedName("shippingAddress")
+    @SerializedName("ShippingAddress")
     public String shippingAddress;
 
-    @SerializedName("orderStatus")
+    @SerializedName("OrderStatus")
     public String orderStatus;
 
-    @SerializedName("paymentMethod")
+    @SerializedName("PaymentMethod")
     public String paymentMethod;
 
-    @SerializedName("paymentStatus")
+    @SerializedName("PaymentStatus")
     public String paymentStatus;
 
-    @SerializedName("orderDetails")
+    @SerializedName("OrderDetails")
     public ArrayList<ReadOrderDetailDTO> orderDetails;
 
-    public ReadOrderDTO() {
+    public ReadOrderHistoryDTO() {
     }
 
-    public ReadOrderDTO(int orderID,int userID, Date orderDate, double totalAmount, String shippingAddress, String orderStatus, String paymentMethod, String paymentStatus, ArrayList<ReadOrderDetailDTO> orderDetails) {
+    public ReadOrderHistoryDTO(int orderID,int userID, Date orderDate, double totalAmount, String shippingAddress, String orderStatus, String paymentMethod, String paymentStatus, ArrayList<ReadOrderDetailDTO> orderDetails) {
         this.orderID = orderID;
         this.userID = userID;
         this.orderDate = orderDate;

@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.bakeryshop.Adapters.OrderDetailAdapter;
 import com.example.bakeryshop.Data.DTO.ReadOrderDTO;
+import com.example.bakeryshop.Data.DTO.ReadOrderHistoryDTO;
 import com.example.bakeryshop.R;
 import com.example.bakeryshop.ViewModel.OrderHistoryDetailViewModel;
 import com.example.bakeryshop.databinding.FragmentOrderHistoryDetailBinding;
@@ -48,7 +49,7 @@ public class OrderHistoryDetailFragment extends Fragment {
         );
 
         // Lấy order từ arguments
-        ReadOrderDTO order = (ReadOrderDTO) getArguments().getSerializable("order");
+        ReadOrderHistoryDTO order = (ReadOrderHistoryDTO) getArguments().getSerializable("order");
         if (order == null) {
             Toast.makeText(getContext(), "Không có dữ liệu đơn hàng!", Toast.LENGTH_SHORT).show();
             requireActivity().getSupportFragmentManager().popBackStack();

@@ -23,7 +23,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ApiClient {
     // QUAN TRỌNG: Đối với localhost trên trình giả lập Android, sử dụng 10.0.2.2
     // Đối với thiết bị thực, sử dụng địa chỉ IP của máy tính của bạn trong mạng cục bộ
-    private static final String BASE_URL = "https://gateway-oh3c.onrender.com/"; // Giữ nguyên HTTPS nếu bạn chọn giải pháp này
+    private static final String BASE_URL = "https://10.0.2.2:7112/"; // Giữ nguyên HTTPS nếu bạn chọn giải pháp này
     private static ApiClient instance;
     private ApiService apiService;
 

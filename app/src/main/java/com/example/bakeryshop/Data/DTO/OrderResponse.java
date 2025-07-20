@@ -6,13 +6,13 @@ import java.util.List;
 
 public class OrderResponse {
         @SerializedName("value")
-    private List<ReadOrderDTO> value;
+    private List<ReadOrderHistoryDTO> value;
 
-    public List<ReadOrderDTO> getValue() {
+    public List<ReadOrderHistoryDTO> getValue() {
         return value;
     }
 
-    public void setValue(List<ReadOrderDTO> value) {
+    public void setValue(List<ReadOrderHistoryDTO> value) {
         this.value = value;
     }
 }

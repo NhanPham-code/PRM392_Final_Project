@@ -86,6 +86,11 @@ public class CheckoutActivity extends AppCompatActivity {
                     if (result.getResultCode() == RESULT_OK) {
                         Toast.makeText(this, "Thanh toán VNPAY thành công!", Toast.LENGTH_SHORT).show();
                         handleSubmitOrder("VNPAY");
+//                        Toast.makeText(this, "Đặt hàng thành công!", Toast.LENGTH_SHORT).show();
+//                        Intent intent = new Intent(this, MainActivity.class);
+//                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+//                        startActivity(intent);
+//                        finish();
                     } else {
                         Toast.makeText(this, "Thanh toán thất bại hoặc bị hủy", Toast.LENGTH_SHORT).show();
                     }
@@ -142,14 +147,14 @@ public class CheckoutActivity extends AppCompatActivity {
             return;
         }
 
-        double total = calculateTotalAmount();
         int selectedRadioId = rgPaymentMethod.getCheckedRadioButtonId();
         if (selectedRadioId == R.id.rb_cash_on_delivery) {
-            handleSubmitOrder("COD");
+            handleSubmitOrder("COD"); // COD thì gọi liền
         } else if (selectedRadioId == R.id.rb_bank_transfer) {
+            double total = calculateTotalAmount();
             Intent intent = new Intent(this, VnPayWebViewActivity.class);
             intent.putExtra("amount", total);
-            vnPayLauncher.launch(intent);
+            vnPayLauncher.launch(intent); // KHÔNG gọi handleSubmitOrder() ở đây
         } else {
             Toast.makeText(this, "Vui lòng chọn phương thức thanh toán", Toast.LENGTH_SHORT).show();
         }

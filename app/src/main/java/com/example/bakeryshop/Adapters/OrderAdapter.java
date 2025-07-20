@@ -11,20 +11,21 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bakeryshop.Data.DTO.ReadOrderDTO;
+import com.example.bakeryshop.Data.DTO.ReadOrderHistoryDTO;
 import com.example.bakeryshop.R;
 
 import java.util.List;
 
 public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHolder> {
 
-    private List<ReadOrderDTO> orderList;
+    private List<ReadOrderHistoryDTO> orderList;
     private final OnItemClickListener listener;
 
     public interface OnItemClickListener {
-        void onItemClick(ReadOrderDTO order);
+        void onItemClick(ReadOrderHistoryDTO order);
     }
 
-    public OrderAdapter(List<ReadOrderDTO> orderList, OnItemClickListener listener) {
+    public OrderAdapter(List<ReadOrderHistoryDTO> orderList, OnItemClickListener listener) {
         this.orderList = orderList;
         this.listener = listener;
     }
@@ -40,7 +41,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
 
     @Override
     public void onBindViewHolder(@NonNull OrderViewHolder holder, int position) {
-        ReadOrderDTO order = orderList.get(position);
+        ReadOrderHistoryDTO order = orderList.get(position);
         holder.bind(order, listener);
         Log.d("Adapter", "→ Binding order: " + order.getOrderStatus());
     }
@@ -50,7 +51,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         return orderList != null ? orderList.size() : 0;
     }
 
-    public void setOrderList(List<ReadOrderDTO> orderList) {
+    public void setOrderList(List<ReadOrderHistoryDTO> orderList) {
         this.orderList = orderList;
         Log.d("Adapter", "→ Set order list: " + orderList.size());
         notifyDataSetChanged();
@@ -69,7 +70,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
             tvShippingAddress = itemView.findViewById(R.id.tv_shipping_address);
         }
 
-        public void bind(ReadOrderDTO order, OnItemClickListener listener) {
+        public void bind(ReadOrderHistoryDTO order, OnItemClickListener listener) {
             if (order == null) return;
 
             tvPrice.setText(formatPrice(order.getTotalAmount()));

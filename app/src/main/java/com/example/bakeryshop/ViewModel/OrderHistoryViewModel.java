@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.bakeryshop.Data.DTO.OrderResponse;
 import com.example.bakeryshop.Data.DTO.ReadOrderDTO;
+import com.example.bakeryshop.Data.DTO.ReadOrderHistoryDTO;
 import com.example.bakeryshop.Data.Repository.OrderRepository;
 
 import java.util.List;
@@ -19,8 +20,8 @@ import retrofit2.Response;
 
 public class OrderHistoryViewModel extends AndroidViewModel {
     private final OrderRepository orderRepository;
-    private final MutableLiveData<List<ReadOrderDTO>> orderHistory = new MutableLiveData<>();
-    public LiveData<List<ReadOrderDTO>> _orderHistory = orderHistory;
+    private final MutableLiveData<List<ReadOrderHistoryDTO>> orderHistory = new MutableLiveData<>();
+    public LiveData<List<ReadOrderHistoryDTO>> _orderHistory = orderHistory;
 
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
     public LiveData<Boolean> _isLoading = isLoading;
