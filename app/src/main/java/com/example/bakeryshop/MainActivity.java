@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
                 return false; // Nếu chưa đăng nhập, không mở fragment
             }
 
+
             if (item.getItemId() == R.id.nav_map) {
                 Intent intent = new Intent(MainActivity.this, Local.class);
                 startActivity(intent);
@@ -68,6 +69,10 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, ChatActivity.class);
                 startActivity(intent);
                 binding.drawerLayout.closeDrawers();
+            }
+            if (item.getItemId() == R.id.nav_feedback) {
+                Intent intent = new Intent(MainActivity.this, FeedbackListActivity.class);
+                startActivity(intent);
             }
 
             return true;

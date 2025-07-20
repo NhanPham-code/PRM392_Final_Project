@@ -2,8 +2,14 @@ package com.example.bakeryshop.Data.Api;
 
 import com.example.bakeryshop.Data.DTO.AddCartItemRequestDTO;
 import com.example.bakeryshop.Data.DTO.CartItemDTO;
+
 import com.example.bakeryshop.Data.DTO.CreateOrderDTO;
 import com.example.bakeryshop.Data.DTO.CreateOrderDetailDTO;
+
+import com.example.bakeryshop.Data.DTO.FeedbackRequestDTO;
+import com.example.bakeryshop.Data.DTO.FeedbackResponseDTO;
+import com.example.bakeryshop.Data.DTO.FeedbackUpdateDTO;
+
 import com.example.bakeryshop.Data.DTO.LoginRequestDTO;
 import com.example.bakeryshop.Data.DTO.LoginResponseDTO;
 import com.example.bakeryshop.Data.DTO.OrderResponse;
@@ -69,7 +75,17 @@ public interface ApiService {
 
     @GET("users/info")
     Call<ReadUserDTO> getUserInfo(); // Lấy thông tin người dùng hiện tại
+    @POST("feedbacks/add")
+    Call<Void> createFeedback(@Body FeedbackRequestDTO feedback);
+    @GET("feedbacks") // hoặc "feedback/me" nếu chỉ muốn của người hiện tại
+    Call<List<FeedbackResponseDTO>> getAllFeedback();
+    @DELETE("feedbacks/del/{userId}")
+    Call<Void> deleteFeedback(@Path("userId") int userId);
 
+    @PUT("feedbacks/up/{feedbackId}")
+    Call<Void> updateFeedback(@Path("feedbackId") int feedbackId, @Body FeedbackUpdateDTO request);
+    @GET("/feedbacks/info")
+    Call<FeedbackResponseDTO> getMyFeedback();
     @PUT("users/update-profile")
     Call<Void> updateUserProfile(@Body UpdateUserProfileDTO userProfileDTO); // Cập nhật thông tin người dùng
     @GET("/OrderHistory/me")
