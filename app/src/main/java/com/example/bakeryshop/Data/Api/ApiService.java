@@ -4,6 +4,7 @@ import com.example.bakeryshop.Data.DTO.AddCartItemRequestDTO;
 import com.example.bakeryshop.Data.DTO.CartItemDTO;
 import com.example.bakeryshop.Data.DTO.LoginRequestDTO;
 import com.example.bakeryshop.Data.DTO.LoginResponseDTO;
+import com.example.bakeryshop.Data.DTO.OrderResponse;
 import com.example.bakeryshop.Data.DTO.ReadProductDTO;
 import com.example.bakeryshop.Data.DTO.ReadUserDTO;
 import com.example.bakeryshop.Data.DTO.RegisterRequestDTO;
@@ -16,6 +17,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
@@ -60,4 +62,6 @@ public interface ApiService {
     @PUT("users/update-profile")
     Call<Void> updateUserProfile(@Body UpdateUserProfileDTO userProfileDTO); // Cập nhật thông tin người dùng
 
+    @GET("/OrderHistory/me")
+    Call<OrderResponse> getAllOrderByUserToken(@Header("Authorization") String token);
 }
