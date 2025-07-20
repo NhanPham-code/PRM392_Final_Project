@@ -2,8 +2,6 @@ package com.example.bakeryshop;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,31 +25,37 @@ import java.util.List;
 public class CheckoutActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
-    private TextView tvTotalAmount;
+    private TextView tvTotalAmount, tvCheckoutTitle;
     private TextInputEditText etShippingAddress;
     private RadioGroup rgPaymentMethod;
-    private MaterialButton btnPlaceOrder;
+    private MaterialButton btnPlaceOrder, btnSelectLocation;
 
     private CartDisplayItemAdapter adapter;
     private List<CartDisplayItem> selectedItems = new ArrayList<>();
     private CheckoutViewModel viewModel;
-    private ActivityResultLauncher<Intent> vnPayLauncher;
 
     private final DecimalFormat decimalFormat = new DecimalFormat("#,##0.00");
+
+    private ActivityResultLauncher<Intent> mapActivityLauncher;
+    private ActivityResultLauncher<Intent> vnPayLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_checkout);
 
+        // Init Views
         recyclerView = findViewById(R.id.recycler_checkout_items);
         tvTotalAmount = findViewById(R.id.tv_total_amount);
+        tvCheckoutTitle = findViewById(R.id.tv_checkout_title);
         etShippingAddress = findViewById(R.id.et_shipping_address);
         rgPaymentMethod = findViewById(R.id.rg_payment_method);
         btnPlaceOrder = findViewById(R.id.btn_place_order);
+        btnSelectLocation = findViewById(R.id.btn_select_location);
 
         viewModel = new CheckoutViewModel(getApplicationContext());
 
+        // Get selected items
         selectedItems = (List<CartDisplayItem>) getIntent().getSerializableExtra("selected_items");
         if (selectedItems == null) selectedItems = new ArrayList<>();
 
@@ -61,7 +65,21 @@ public class CheckoutActivity extends AppCompatActivity {
 
         updateTotalAmount();
 
-        // Đăng ký VNPay launcher trước khi dùng
+        // MapActivity launcher
+        mapActivityLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        String selectedAddress = result.getData().getStringExtra("selected_address");
+                        if (selectedAddress != null && !selectedAddress.isEmpty()) {
+                            etShippingAddress.setText(selectedAddress);
+                            Toast.makeText(this, "Đã chọn địa chỉ thành công", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+        );
+
+        // VNPay launcher
         vnPayLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -74,12 +92,11 @@ public class CheckoutActivity extends AppCompatActivity {
                 }
         );
 
-        btnPlaceOrder.setOnClickListener(v -> handlePlaceOrder());
+        setupClickListeners();
 
         viewModel.getOrderSuccess().observe(this, success -> {
             if (Boolean.TRUE.equals(success)) {
                 Toast.makeText(this, "Đặt hàng thành công!", Toast.LENGTH_SHORT).show();
-                // Quay về MainActivity thay vì chỉ finish()
                 Intent intent = new Intent(this, MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
@@ -88,6 +105,21 @@ public class CheckoutActivity extends AppCompatActivity {
                 Toast.makeText(this, "Đặt hàng thất bại!", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void setupClickListeners() {
+        tvCheckoutTitle.setOnClickListener(v -> openMapActivity());
+        btnSelectLocation.setOnClickListener(v -> openMapActivity());
+        btnPlaceOrder.setOnClickListener(v -> handlePlaceOrder());
+    }
+
+    private void openMapActivity() {
+        Intent intent = new Intent(this, MapActivity.class);
+        String currentAddress = etShippingAddress.getText().toString().trim();
+        if (!currentAddress.isEmpty()) {
+            intent.putExtra("current_address", currentAddress);
+        }
+        mapActivityLauncher.launch(intent);
     }
 
     private void updateTotalAmount() {
@@ -118,6 +150,8 @@ public class CheckoutActivity extends AppCompatActivity {
             Intent intent = new Intent(this, VnPayWebViewActivity.class);
             intent.putExtra("amount", total);
             vnPayLauncher.launch(intent);
+        } else {
+            Toast.makeText(this, "Vui lòng chọn phương thức thanh toán", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -127,4 +161,3 @@ public class CheckoutActivity extends AppCompatActivity {
         viewModel.placeOrder(paymentMethod, address, total, selectedItems);
     }
 }
-
