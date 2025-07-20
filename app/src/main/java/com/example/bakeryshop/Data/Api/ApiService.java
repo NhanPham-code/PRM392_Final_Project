@@ -2,8 +2,19 @@ package com.example.bakeryshop.Data.Api;
 
 import com.example.bakeryshop.Data.DTO.AddCartItemRequestDTO;
 import com.example.bakeryshop.Data.DTO.CartItemDTO;
+
+import com.example.bakeryshop.Data.DTO.CreateOrderDTO;
+import com.example.bakeryshop.Data.DTO.CreateOrderDetailDTO;
+
+import com.example.bakeryshop.Data.DTO.FeedbackRequestDTO;
+import com.example.bakeryshop.Data.DTO.FeedbackResponseDTO;
+import com.example.bakeryshop.Data.DTO.FeedbackUpdateDTO;
+
 import com.example.bakeryshop.Data.DTO.LoginRequestDTO;
 import com.example.bakeryshop.Data.DTO.LoginResponseDTO;
+import com.example.bakeryshop.Data.DTO.OrderResponse;
+import com.example.bakeryshop.Data.DTO.ReadOrderDTO;
+import com.example.bakeryshop.Data.DTO.ReadOrderDetailDTO;
 import com.example.bakeryshop.Data.DTO.ReadProductDTO;
 import com.example.bakeryshop.Data.DTO.ReadUserDTO;
 import com.example.bakeryshop.Data.DTO.RegisterRequestDTO;
@@ -16,6 +27,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
@@ -54,10 +66,31 @@ public interface ApiService {
     @PUT("cart/update-quantities")
     Call<Void> updateCartQuantities(@Body List<UpdateCartQuantityRequest> updates); // Body là danh sách các đối tượng cần update
 
+    @POST("/OrderHistory/add")
+    Call<ReadOrderDTO> createOrder(@Body CreateOrderDTO order);
+
+    @POST("/OrderDetails/create")
+    Call<Void> createOrderDetail(@Body CreateOrderDetailDTO orderDetail);
+
+
     @GET("users/info")
     Call<ReadUserDTO> getUserInfo(); // Lấy thông tin người dùng hiện tại
+    @POST("feedbacks/add")
+    Call<Void> createFeedback(@Body FeedbackRequestDTO feedback);
+    @GET("feedbacks") // hoặc "feedback/me" nếu chỉ muốn của người hiện tại
+    Call<List<FeedbackResponseDTO>> getAllFeedback();
+    @DELETE("feedbacks/del/{userId}")
+    Call<Void> deleteFeedback(@Path("userId") int userId);
 
+    @PUT("feedbacks/up/{feedbackId}")
+    Call<Void> updateFeedback(@Path("feedbackId") int feedbackId, @Body FeedbackUpdateDTO request);
+    @GET("/feedbacks/info")
+    Call<FeedbackResponseDTO> getMyFeedback();
     @PUT("users/update-profile")
     Call<Void> updateUserProfile(@Body UpdateUserProfileDTO userProfileDTO); // Cập nhật thông tin người dùng
+    @GET("/OrderHistory/me")
+    Call<OrderResponse> getAllOrderByUserToken(@Header("Authorization") String token);
 
+    @GET("/OrderHistory/details/{orderId}")
+    Call<List<ReadOrderDetailDTO>> getOrderDetailsByOrderId(@Path("orderId") int orderId);
 }
