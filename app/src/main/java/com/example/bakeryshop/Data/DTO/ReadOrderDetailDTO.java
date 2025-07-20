@@ -5,12 +5,14 @@ public class ReadOrderDetailDTO {
     public int orderID;
     public int productID;
     public String productName;
+    public String productImg;
     public int quantity;
     public double unitPrice;
     public double totalPrice;
 
     public ReadOrderDetailDTO() {
     }
+
 
     public int getOrderDetailID() {
         return orderDetailID;
@@ -22,6 +24,14 @@ public class ReadOrderDetailDTO {
 
     public int getOrderID() {
         return orderID;
+    }
+
+    public String getProductImg() {
+        return productImg;
+    }
+
+    public void setProductImg(String productImg) {
+        this.productImg = productImg;
     }
 
     public void setOrderID(int orderID) {

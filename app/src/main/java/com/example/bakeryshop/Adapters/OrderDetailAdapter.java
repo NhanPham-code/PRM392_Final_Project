@@ -14,30 +14,30 @@ import com.example.bakeryshop.R;
 
 import java.util.List;
 
-public class OrderDetailAdapter extends RecyclerView.Adapter<OrderDetailAdapter.OrderDetailViewHolder> {
-    private List<ReadOrderDetailDTO> orderDetailList;
-    private ProductRepository productRepository;
-    private Context context;
-    public OrderDetailAdapter(List<ReadOrderDetailDTO> orderDetailList, Context context) {
-        this.orderDetailList = orderDetailList;
-        this.context = context;
-    }
-
-
-    @NonNull
-    @Override
-    public OrderDetailAdapter.OrderDetailViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_order_detail_history, parent, false);
-        return new OrderDetailViewHolder(view);
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull OrderDetailAdapter.OrderDetailViewHolder holder, int position) {
-
-    }
-
-    @Override
-    public int getItemCount() {
-        return 0;
-    }
-}
+//public class OrderDetailAdapter extends RecyclerView.Adapter<OrderDetailAdapter.OrderDetailViewHolder> {
+//    private List<ReadOrderDetailDTO> orderDetailList;
+//    private ProductRepository productRepository;
+//    private Context context;
+//    public OrderDetailAdapter(List<ReadOrderDetailDTO> orderDetailList, Context context) {
+//        this.orderDetailList = orderDetailList;
+//        this.context = context;
+//    }
+//
+//
+//    @NonNull
+//    @Override
+//    public OrderDetailAdapter.OrderDetailViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+//        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_order_detail_history, parent, false);
+//        return new OrderDetailViewHolder(view);
+//    }
+//
+//    @Override
+//    public void onBindViewHolder(@NonNull OrderDetailAdapter.OrderDetailViewHolder holder, int position) {
+//
+//    }
+//
+//    @Override
+//    public int getItemCount() {
+//        return 0;
+//    }
+//}
