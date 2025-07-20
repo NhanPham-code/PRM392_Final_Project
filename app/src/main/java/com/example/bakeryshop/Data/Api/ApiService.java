@@ -8,6 +8,7 @@ import com.example.bakeryshop.Data.DTO.LoginRequestDTO;
 import com.example.bakeryshop.Data.DTO.LoginResponseDTO;
 import com.example.bakeryshop.Data.DTO.OrderResponse;
 import com.example.bakeryshop.Data.DTO.ReadOrderDTO;
+import com.example.bakeryshop.Data.DTO.ReadOrderDetailDTO;
 import com.example.bakeryshop.Data.DTO.ReadProductDTO;
 import com.example.bakeryshop.Data.DTO.ReadUserDTO;
 import com.example.bakeryshop.Data.DTO.RegisterRequestDTO;
@@ -73,4 +74,7 @@ public interface ApiService {
     Call<Void> updateUserProfile(@Body UpdateUserProfileDTO userProfileDTO); // Cập nhật thông tin người dùng
     @GET("/OrderHistory/me")
     Call<OrderResponse> getAllOrderByUserToken(@Header("Authorization") String token);
+
+    @GET("/OrderHistory/details/{orderId}")
+    Call<List<ReadOrderDetailDTO>> getOrderDetailsByOrderId(@Path("orderId") int orderId);
 }

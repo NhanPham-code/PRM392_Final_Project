@@ -21,7 +21,6 @@ import com.example.bakeryshop.LoginActivity;
 import com.example.bakeryshop.R;
 import com.example.bakeryshop.ViewModel.ProfileViewModel;
 import com.example.bakeryshop.databinding.FragmentProfileBinding;
-import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.time.LocalDateTime;
@@ -112,7 +111,7 @@ public class ProfileFragment extends Fragment {
             startActivity(intent);
         });
         binding.layoutOrder.setOnClickListener(v -> {
-            FragmentOrderHistory fragment = new FragmentOrderHistory();
+            OrderHistoryFragment fragment = new OrderHistoryFragment();
             requireActivity().getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fragment_container, fragment) // container là layout chứa fragment

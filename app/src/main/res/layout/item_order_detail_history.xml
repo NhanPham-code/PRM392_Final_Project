@@ -4,67 +4,168 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="4dp"
-    app:cardBackgroundColor="@color/colorCardBackground">
+    android:layout_margin="16dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="8dp"
+    app:cardBackgroundColor="@color/colorCardBackground"
+    app:strokeWidth="1dp"
+    app:strokeColor="@color/colorAccent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="12dp">
+        android:padding="16dp">
 
-        <!-- orderDetailID -->
-        <TextView
-            android:id="@+id/tv_order_detail_id"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Chi tiết đơn hàng ID: 0"
-            android:textSize="16sp"
-            android:textColor="@color/colorTextSecondary"/>
-
-        <!-- productName -->
+        <!-- Order Detail ID Header -->
         <TextView
             android:id="@+id/tv_product_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Tên sản phẩm"
+            android:text="Product Name"
             android:textStyle="bold"
-            android:textSize="18sp"
+            android:textSize="20sp"
             android:textColor="@color/colorTextPrimary"
-            android:layout_marginTop="4dp"/>
+            android:background="@drawable/rounded_background"
+            android:padding="8dp"
+            android:layout_marginBottom="8dp"
+            android:maxLines="2"
+            android:ellipsize="end"/>
 
-        <!-- quantity -->
-        <TextView
-            android:id="@+id/tv_quantity"
+        <!-- Product Image Container -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Số lượng: 0"
-            android:textSize="16sp"
-            android:textColor="@color/colorTextSecondary"
-            android:layout_marginTop="4dp"/>
+            app:cardCornerRadius="8dp"
+            app:cardElevation="2dp"
+            android:layout_marginBottom="16dp">
 
-        <!-- unitPrice -->
-        <TextView
-            android:id="@+id/tv_unit_price"
+            <ImageView
+                android:id="@+id/iv_product_img"
+                android:layout_width="match_parent"
+                android:layout_height="180dp"
+                android:scaleType="centerCrop"
+                android:contentDescription="Product Image"
+                android:src="@drawable/cookies" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Product Information Section -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Đơn giá: 0.00"
-            android:textSize="16sp"
-            android:textColor="@color/colorTextSecondary"
-            android:layout_marginTop="4dp"/>
+            android:orientation="vertical"
+            android:background="@drawable/rounded_info_background"
+            android:padding="12dp">
 
-        <!-- totalPrice -->
-        <TextView
-            android:id="@+id/tv_total_price"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Thành tiền: 0.00"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            android:textColor="@color/bakery_brown"
-            android:layout_marginTop="8dp"/>
+            <!-- Product Name -->
+
+
+            <!-- Quantity and Unit Price Row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:background="@drawable/info_item_background"
+                    android:padding="8dp"
+                    android:layout_marginEnd="4dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Quantity"
+                        android:textSize="12sp"
+                        android:textColor="@color/colorTextSecondary"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/tv_quantity"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textSize="16sp"
+                        android:textColor="@color/colorTextPrimary"
+                        android:textStyle="bold"
+                        android:layout_marginTop="2dp"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:background="@drawable/info_item_background"
+                    android:padding="8dp"
+                    android:layout_marginStart="4dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Unit Price"
+                        android:textSize="12sp"
+                        android:textColor="@color/colorTextSecondary"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/tv_unit_price"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="$0.00"
+                        android:textSize="16sp"
+                        android:textColor="@color/colorTextPrimary"
+                        android:textStyle="bold"
+                        android:layout_marginTop="2dp"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/colorDivider"
+                android:layout_marginVertical="8dp"/>
+
+            <!-- Total Price -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@drawable/total_price_background"
+                android:padding="12dp"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Total Amount:"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorTextPrimary"/>
+
+                <TextView
+                    android:id="@+id/tv_total_price"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="$0.00"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:textColor="@color/white"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
 
     </LinearLayout>
+
 </com.google.android.material.card.MaterialCardView>

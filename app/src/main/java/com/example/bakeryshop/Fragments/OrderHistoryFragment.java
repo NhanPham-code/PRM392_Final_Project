@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -16,13 +15,13 @@ import com.example.bakeryshop.R;
 import com.example.bakeryshop.ViewModel.OrderHistoryViewModel;
 import com.example.bakeryshop.databinding.FragmentOrderHistoryBinding;
 
-public class FragmentOrderHistory extends Fragment {
+public class OrderHistoryFragment extends Fragment {
 
     private FragmentOrderHistoryBinding binding;
     private OrderHistoryViewModel orderHistoryViewModel;
     private OrderAdapter orderAdapter;
 
-    public FragmentOrderHistory() {
+    public OrderHistoryFragment() {
         // Empty constructor
     }
 

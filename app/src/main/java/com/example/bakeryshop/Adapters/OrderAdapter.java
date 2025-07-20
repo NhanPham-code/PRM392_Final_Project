@@ -32,9 +32,9 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
     @NonNull
     @Override
     public OrderViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Log.d("Adapter", "→ onCreateViewHolder đang chạy");  // ✅ LOG
+        Log.d("Adapter", "→ onCreateViewHolder is running");
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_history_order, parent, false); // ✅ Đúng tên layout
+                .inflate(R.layout.item_history_order, parent, false);
         return new OrderViewHolder(view);
     }
 
@@ -42,7 +42,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
     public void onBindViewHolder(@NonNull OrderViewHolder holder, int position) {
         ReadOrderDTO order = orderList.get(position);
         holder.bind(order, listener);
-        Log.d("Adapter", "→ Đang bind đơn: " + order.getOrderStatus()); // ✅ LOG
+        Log.d("Adapter", "→ Binding order: " + order.getOrderStatus());
     }
 
     @Override
@@ -52,7 +52,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
 
     public void setOrderList(List<ReadOrderDTO> orderList) {
         this.orderList = orderList;
-        Log.d("Adapter", "→ Gán danh sách: " + orderList.size()); // ✅ LOG
+        Log.d("Adapter", "→ Set order list: " + orderList.size());
         notifyDataSetChanged();
     }
 
@@ -73,23 +73,28 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
             if (order == null) return;
 
             tvPrice.setText(formatPrice(order.getTotalAmount()));
-            tvOrderDate.setText("Ngày đặt: " + order.getOrderDate());
+            tvOrderDate.setText("Order Date: " + order.getOrderDate());
             tvStatus.setText(order.getOrderStatus());
-            tvPaymentMethod.setText("Thanh toán: " + order.getPaymentMethod());
-            tvShippingAddress.setText("Giao đến: " + order.getShippingAddress());
+            tvPaymentMethod.setText("Payment: " + order.getPaymentMethod());
+            tvShippingAddress.setText("Deliver to: " + order.getShippingAddress());
 
-            // Tô màu trạng thái
-            if ("Shipped".equalsIgnoreCase(order.getOrderStatus())) {
-                tvStatus.setTextColor(Color.parseColor("#4CAF50")); // Xanh lá
-            } else if("Pending".equalsIgnoreCase(order.getOrderStatus())) {
-                tvStatus.setTextColor(Color.parseColor("#FF9800")); // Cam
+            // Set status color
+            if ("Shipped".equalsIgnoreCase(order.getOrderStatus()) ||
+                    "Delivered".equalsIgnoreCase(order.getOrderStatus())) {
+                tvStatus.setTextColor(Color.parseColor("#4CAF50")); // Green
+            } else if ("Pending".equalsIgnoreCase(order.getOrderStatus())) {
+                tvStatus.setTextColor(Color.parseColor("#FF9800")); // Orange
+            } else if ("Processing".equalsIgnoreCase(order.getOrderStatus())) {
+                tvStatus.setTextColor(Color.parseColor("#2196F3")); // Blue
+            } else if ("Cancelled".equalsIgnoreCase(order.getOrderStatus())) {
+                tvStatus.setTextColor(Color.parseColor("#F44336")); // Red
             }
 
             itemView.setOnClickListener(v -> listener.onItemClick(order));
         }
 
         private String formatPrice(double price) {
-            return String.format("₫%,.0f", price);
+            return String.format("$%.2f", price);
         }
     }
 }

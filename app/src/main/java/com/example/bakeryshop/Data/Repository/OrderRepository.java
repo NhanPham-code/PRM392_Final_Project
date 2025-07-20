@@ -9,6 +9,7 @@ import com.example.bakeryshop.Data.DTO.CreateOrderDTO;
 import com.example.bakeryshop.Data.DTO.CreateOrderDetailDTO;
 import com.example.bakeryshop.Data.DTO.OrderResponse;
 import com.example.bakeryshop.Data.DTO.ReadOrderDTO;
+import com.example.bakeryshop.Data.DTO.ReadOrderDetailDTO;
 
 import java.util.List;
 
@@ -39,6 +40,10 @@ public class OrderRepository  {
 
     public Call<Void> createOrderDetail(CreateOrderDetailDTO orderDetail) {
         return apiService.createOrderDetail(orderDetail);
+    }
+
+    public Call<List<ReadOrderDetailDTO>> getOrderDetailsByOrderId(int orderId) {
+        return apiService.getOrderDetailsByOrderId(orderId);
     }
 
 }

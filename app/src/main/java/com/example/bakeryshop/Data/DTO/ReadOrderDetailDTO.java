@@ -1,18 +1,40 @@
 package com.example.bakeryshop.Data.DTO;
 
+import com.google.gson.annotations.SerializedName;
+
+
 public class ReadOrderDetailDTO {
+    @SerializedName("orderDetailID")
     public int orderDetailID;
+    @SerializedName("orderID")
     public int orderID;
+    @SerializedName("productID")
     public int productID;
+    @SerializedName("productName")
     public String productName;
+    @SerializedName("productImg")
     public String productImg;
+    @SerializedName("quantity")
     public int quantity;
+    @SerializedName("unitPrice")
     public double unitPrice;
+    @SerializedName("lineTotal")
     public double totalPrice;
+
 
     public ReadOrderDetailDTO() {
     }
 
+    public ReadOrderDetailDTO(int orderDetailID, int orderID, int productID, String productName, String productImg, int quantity, double unitPrice, double totalPrice) {
+        this.orderDetailID = orderDetailID;
+        this.orderID = orderID;
+        this.productID = productID;
+        this.productName = productName;
+        this.productImg = productImg;
+        this.quantity = quantity;
+        this.unitPrice = unitPrice;
+        this.totalPrice = totalPrice;
+    }
 
     public int getOrderDetailID() {
         return orderDetailID;
