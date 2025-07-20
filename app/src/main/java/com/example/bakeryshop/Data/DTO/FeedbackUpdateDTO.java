@@ -1,22 +1,19 @@
 package com.example.bakeryshop.Data.DTO;
 
-public class FeedbackUpdateDTO {
-    private int feedbackID;
-    private String description;
+import com.google.gson.annotations.SerializedName;
 
-    public FeedbackUpdateDTO(int feedbackID, String description) {
-        this.feedbackID = feedbackID;
-        this.description = description;
-    }
+public class FeedbackUpdateDTO {
+    @SerializedName("feedbackID")
+    private int feedbackID;
+
+    @SerializedName("description")
+    private String description;
 
     public FeedbackUpdateDTO() {
     }
 
-    public int getFeedbackID() {
-        return feedbackID;
-    }
-
-    public void setFeedbackID(int feedbackID) {
+    public FeedbackUpdateDTO(int feedbackID,String description) {
+        this.description = description;
         this.feedbackID = feedbackID;
     }
 
@@ -26,5 +23,13 @@ public class FeedbackUpdateDTO {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public int getFeedbackID() {
+        return feedbackID;
+    }
+
+    public void setFeedbackID(int feedbackID) {
+        this.feedbackID = feedbackID;
     }
 }

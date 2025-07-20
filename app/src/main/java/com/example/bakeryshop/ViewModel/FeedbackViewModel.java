@@ -12,6 +12,7 @@ import android.content.Context;
 
 import com.example.bakeryshop.Data.DTO.FeedbackRequestDTO;
 import com.example.bakeryshop.Data.DTO.FeedbackResponseDTO;
+import com.example.bakeryshop.Data.DTO.FeedbackUpdateDTO;
 import com.example.bakeryshop.Data.Repository.FeedbackRepository;
 
 import java.util.List;
@@ -39,11 +40,12 @@ public class FeedbackViewModel extends AndroidViewModel {
     // Kết quả thêm feedback
     private final MutableLiveData<Boolean> _createSuccess = new MutableLiveData<>();
     public LiveData<Boolean> createSuccess = _createSuccess;
-
+    private final MutableLiveData<FeedbackResponseDTO> _myFeedback = new MutableLiveData<>();
+    public LiveData<FeedbackResponseDTO> myFeedback = _myFeedback;
     public FeedbackViewModel(@NonNull Application application) {
         super(application);
         Context context = application.getApplicationContext();
-        feedbackRepository = new FeedbackRepository(context);
+        feedbackRepository = FeedbackRepository.getInstance(application.getApplicationContext());
     }
 
     /**
@@ -91,38 +93,31 @@ public class FeedbackViewModel extends AndroidViewModel {
     public void clearErrorMessage() {
         _errorMessage.setValue(null);
     }
-    public void addFeedback(int userId, String description, Runnable onSuccess, Runnable onError) {
+    public void addFeedback(String description, Runnable onSuccess, Runnable onError) {
         _isLoading.setValue(true);
-
-        FeedbackRequestDTO request = new FeedbackRequestDTO(userId, description);
-
-        Log.d("FeedbackDebug", "Gọi API thêm phản hồi");
-
+        FeedbackRequestDTO request = new FeedbackRequestDTO(description);
         feedbackRepository.createFeedback(request).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
                 _isLoading.setValue(false);
                 if (response.isSuccessful()) {
-                    Log.d("FeedbackDebug", "Thêm phản hồi thành công");
                     onSuccess.run();
                 } else {
-                    Log.e("FeedbackDebug", "Lỗi API thêm phản hồi: " + response.code());
                     onError.run();
                 }
             }
-
             @Override
             public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
                 _isLoading.setValue(false);
-                Log.e("FeedbackDebug", "Lỗi mạng khi thêm phản hồi: " + t.getMessage());
                 onError.run();
             }
         });
     }
-    public void deleteFeedback(int feedbackId, Runnable onSuccess, Runnable onError) {
+
+    public void deleteFeedback(int userId, Runnable onSuccess, Runnable onError) {
         _isLoading.setValue(true);
 
-        feedbackRepository.deleteFeedback(feedbackId).enqueue(new Callback<Void>() {
+        feedbackRepository.deleteFeedback(userId).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
                 _isLoading.setValue(false);
@@ -147,8 +142,8 @@ public class FeedbackViewModel extends AndroidViewModel {
     public void updateFeedback(int feedbackId, String description, Runnable onSuccess, Runnable onError) {
         _isLoading.setValue(true);
 
-        FeedbackRequestDTO request = new FeedbackRequestDTO(description);
-
+        FeedbackUpdateDTO request = new FeedbackUpdateDTO(feedbackId, description);
+        Log.d("UpdateFeedback", "Gọi update với feedbackId: " + feedbackId);
         feedbackRepository.updateFeedback(feedbackId, request).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
@@ -167,6 +162,53 @@ public class FeedbackViewModel extends AndroidViewModel {
                 _isLoading.setValue(false);
                 _createSuccess.setValue(false);
                 onError.run();
+            }
+        });
+    }
+
+
+    public void detectMyFeedback(int userId) {
+        List<FeedbackResponseDTO> list = _feedbacks.getValue();
+        if (list != null) {
+            for (FeedbackResponseDTO fb : list) {
+                if (fb.getUserId() == userId) {
+                    _myFeedback.setValue(fb);
+                    return;
+                }
+            }
+        }
+        _myFeedback.setValue(null);
+    }
+    public void fetchMyFeedback() {
+        _isLoading.setValue(true);
+        feedbackRepository.getMyFeedback().enqueue(new Callback<FeedbackResponseDTO>() {
+            @Override
+            public void onResponse(Call<FeedbackResponseDTO> call, Response<FeedbackResponseDTO> response) {
+                _isLoading.setValue(false);
+
+                if (response.isSuccessful() && response.body() != null) {
+                    FeedbackResponseDTO fb = response.body();
+                    if (fb.getFeedbackId() == 0) {
+                        _myFeedback.setValue(null); // Không có phản hồi thực sự
+                        Log.d("MyFeedback", "Chưa có phản hồi, feedbackId = 0");
+                    } else {
+                        _myFeedback.setValue(fb);
+                        Log.d("MyFeedback", "Đã lấy được phản hồi: " + fb.getDescription());
+                    }
+                } else if (response.code() == 404) {
+                    _myFeedback.setValue(null);
+                    Log.d("MyFeedback", "Chưa có phản hồi, API trả về 404");
+                } else {
+                    _errorMessage.setValue("Lỗi khi lấy phản hồi của bạn");
+                    Log.e("MyFeedback", "Lỗi response khác: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<FeedbackResponseDTO> call, Throwable t) {
+                _isLoading.setValue(false);
+                _errorMessage.setValue("Lỗi mạng: " + t.getMessage());
+                Log.e("MyFeedback", "Lỗi mạng khi gọi API: " + t.getMessage());
             }
         });
     }

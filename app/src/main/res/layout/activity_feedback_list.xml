@@ -1,97 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#FFF8F0"
 
-    <LinearLayout
-        android:id="@+id/layout_feedback_list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="16dp"
-        android:background="#FFFFFF">
+    >
 
-        <TextView
-            android:id="@+id/tvTitleFeedback"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Danh sách phản hồi"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="12dp"
-            android:textColor="#333333" />
+<LinearLayout
+android:id="@+id/layout_feedback_list"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:orientation="vertical"
+android:padding="20dp"
+android:background="#FFF8F0"
+    >
 
-        <!-- Nút Thêm Phản Hồi -->
-        <Button
-            android:id="@+id/btnAddFeedback"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Thêm phản hồi"
-            android:layout_marginBottom="12dp" />
+<TextView
+    android:id="@+id/tvTitleFeedback"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Danh sách phản hồi"
+    android:textSize="22sp"
+    android:textStyle="bold"
+    android:textColor="#D35400"
+android:layout_marginBottom="16dp"
+android:fontFamily="sans-serif-medium"/>
 
-        <!-- Feedback của chính user -->
-        <LinearLayout
-            android:id="@+id/layoutMyFeedback"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="12dp"
-            android:background="#FFF7E5"
-            android:visibility="gone"
-            android:layout_marginBottom="12dp"
-            android:elevation="2dp">
+<!-- Nút Thêm Phản Hồi -->
+<Button
+    android:id="@+id/btnMyFeedback"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Phản hồi của bạn"
+    android:textColor="#9B1D1D"
+    android:textAllCaps="false"
+    android:backgroundTint="#E67E22"
+android:paddingLeft="24dp"
+android:paddingRight="24dp"
+android:paddingTop="12dp"
+android:paddingBottom="12dp"
+android:layout_marginBottom="16dp"
+android:fontFamily="sans-serif-medium"
+android:elevation="4dp"
+android:background="@drawable/btn_rounded_orange"/>
 
-            <TextView
-                android:id="@+id/tvMyFeedbackLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Phản hồi của bạn:"
-                android:textStyle="bold"
-                android:textSize="16sp"
-                android:textColor="#000000"
-                android:layout_marginBottom="4dp"/>
+<!-- Danh sách phản hồi của người khác -->
+<androidx.recyclerview.widget.RecyclerView
+    android:id="@+id/rvFeedbackList"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:clipToPadding="false"
+    android:paddingBottom="8dp"
+    android:scrollbars="vertical"/>
 
-            <TextView
-                android:id="@+id/tvMyFeedbackContent"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Nội dung phản hồi của bạn sẽ hiển thị ở đây"
-                android:textSize="14sp"
-                android:textColor="#555555"
-                android:layout_marginBottom="8dp"/>
+<!-- Progress bar loading -->
+<ProgressBar
+    android:id="@+id/progressBar"
+    style="?android:attr/progressBarStyleLarge"
+    android:layout_width="48dp"
+    android:layout_height="48dp"
+    android:layout_gravity="center"
+    android:visibility="gone"
+    android:layout_marginTop="20dp"
+    android:indeterminateTint="#E67E22" />
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
+</LinearLayout>
 
-                <ImageView
-                    android:id="@+id/btnEditMyFeedback"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:src="@drawable/ic_edit"
-                    android:contentDescription="Sửa"
-                    android:padding="4dp"/>
-
-                <ImageView
-                    android:id="@+id/btnDeleteMyFeedback"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:src="@drawable/ic_delete"
-                    android:contentDescription="Xoá"
-                    android:padding="4dp"
-                    android:layout_marginStart="16dp"/>
-
-            </LinearLayout>
-        </LinearLayout>
-
-        <!-- Danh sách tất cả phản hồi -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvFeedbackList"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:clipToPadding="false"
-            android:paddingBottom="8dp"/>
-    </LinearLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>

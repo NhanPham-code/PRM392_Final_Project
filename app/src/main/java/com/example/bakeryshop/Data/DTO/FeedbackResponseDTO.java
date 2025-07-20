@@ -4,10 +4,10 @@ import com.google.gson.annotations.SerializedName;
 
 public class FeedbackResponseDTO {
 
-    @SerializedName("feedbackId")
+    @SerializedName("feedbackID")   // ✅ Trùng JSON trả về
     private int feedbackId;
 
-    @SerializedName("userId")
+    @SerializedName("userID")       // ✅ Trùng JSON trả về
     private int userId;
 
     @SerializedName("description")

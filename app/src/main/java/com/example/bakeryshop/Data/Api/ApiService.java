@@ -63,12 +63,13 @@ public interface ApiService {
     Call<Void> createFeedback(@Body FeedbackRequestDTO feedback);
     @GET("feedbacks") // hoặc "feedback/me" nếu chỉ muốn của người hiện tại
     Call<List<FeedbackResponseDTO>> getAllFeedback();
-    @DELETE("feedbacks/{id}")
-    Call<Void> deleteFeedback(@Path("id") int id);
+    @DELETE("feedbacks/del/{userId}")
+    Call<Void> deleteFeedback(@Path("userId") int userId);
 
-    @PUT("feedbacks/{feedbackId}")
-    Call<Void> updateFeedback(@Path("feedbackId") int feedbackId, @Body FeedbackUpdateDTO dto);
-
+    @PUT("feedbacks/up/{feedbackId}")
+    Call<Void> updateFeedback(@Path("feedbackId") int feedbackId, @Body FeedbackUpdateDTO request);
+    @GET("/feedbacks/info")
+    Call<FeedbackResponseDTO> getMyFeedback();
     @PUT("users/update-profile")
     Call<Void> updateUserProfile(@Body UpdateUserProfileDTO userProfileDTO); // Cập nhật thông tin người dùng
 
