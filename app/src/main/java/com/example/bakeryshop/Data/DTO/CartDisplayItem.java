@@ -1,9 +1,13 @@
 package com.example.bakeryshop.Data.DTO;
 
-public class CartDisplayItem {
+import java.io.Serializable;
+
+public class CartDisplayItem implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private CartItemDTO cartItem;
     private ReadProductDTO product;
-    private boolean isSelected; // Đảm bảo trường này tồn tại
+    private boolean isSelected; // Trường để theo dõi trạng thái chọn
 
     public CartDisplayItem(CartItemDTO cartItem, ReadProductDTO product) {
         this.cartItem = cartItem;
@@ -11,20 +15,32 @@ public class CartDisplayItem {
         this.isSelected = false; // Mặc định là chưa chọn khi khởi tạo
     }
 
-    public CartItemDTO getCartItem() {
-        return cartItem;
+    public CartDisplayItem(CartItemDTO cartItem, ReadProductDTO product, boolean isSelected) {
+        this.cartItem = cartItem;
+        this.product = product;
+        this.isSelected = isSelected;
     }
 
-    public ReadProductDTO getProduct() {
-        return product;
+    public CartItemDTO getCartItem() { return cartItem; }
+    public void setCartItem(CartItemDTO cartItem) { this.cartItem = cartItem; }
+
+    public ReadProductDTO getProduct() { return product; }
+    public void setProduct(ReadProductDTO product) { this.product = product; }
+
+    public boolean isSelected() { return isSelected; } // Getter
+    public void setSelected(boolean selected) { isSelected = selected; } // Setter
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CartDisplayItem that = (CartDisplayItem) o;
+        // So sánh dựa trên cartItem ID để xác định cùng một mục giỏ hàng
+        return cartItem != null ? cartItem.getCartID() == that.getCartItem().getCartID() : that.getCartItem() == null;
     }
 
-    // Các phương thức getter và setter cho isSelected - ĐẢM BẢO CÓ CÁC PHƯƠNG THỨC NÀY
-    public boolean isSelected() {
-        return isSelected;
-    }
-
-    public void setSelected(boolean selected) {
-        isSelected = selected;
+    @Override
+    public int hashCode() {
+        return cartItem != null ? Integer.valueOf(cartItem.getCartID()).hashCode() : 0;
     }
 }

@@ -1,28 +1,45 @@
 package com.example.bakeryshop.Adapters;
 
+import android.graphics.Bitmap; // Giữ lại import này mặc dù không dùng HttpURLConnection nữa, có thể bạn dùng ở nơi khác
+import android.graphics.BitmapFactory; // Giữ lại import này
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log; // <--- THÊM DÒNG NÀY ĐỂ DEBUG
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.Toast; // Giữ lại Toast cho logic tăng/giảm số lượng
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bakeryshop.Data.DTO.CartDisplayItem;
 import com.example.bakeryshop.R;
+import com.google.android.material.imageview.ShapeableImageView; // Giữ lại ShapeableImageView
 
+import java.io.InputStream; // Giữ lại import này
+import java.net.HttpURLConnection; // Giữ lại import này
+import java.net.URL; // Giữ lại import này
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService; // Giữ lại import này
+import java.util.concurrent.Executors; // Giữ lại import này
 
 public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder> {
 
-    private List<CartDisplayItem> items = new ArrayList<>();
+    private final List<CartDisplayItem> items = new ArrayList<>();
     private OnCartItemActionListener listener;
+    private final DecimalFormat decimalFormat = new DecimalFormat("#,##0.00");
+    private final Map<Integer, Boolean> selectedStates = new HashMap<>();
+    // Dù không dùng cho tải ảnh nữa, giữ lại ExecutorService và Handler vì có thể dùng cho tác vụ bất đồng bộ khác
+    private final ExecutorService executorService = Executors.newFixedThreadPool(2);
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     public interface OnCartItemActionListener {
         void onIncreaseQuantity(CartDisplayItem item);
@@ -35,8 +52,26 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         this.listener = listener;
     }
 
-    public void setItems(List<CartDisplayItem> items) {
-        this.items = items;
+    public void setItems(List<CartDisplayItem> newItems) {
+        this.items.clear();
+        this.items.addAll(newItems);
+
+        Map<Integer, Boolean> newSelectedStates = new HashMap<>();
+        for (CartDisplayItem item : newItems) {
+            int cartId = item.getCartItem().getCartID();
+            newSelectedStates.put(cartId, selectedStates.getOrDefault(cartId, false));
+            item.setSelected(newSelectedStates.get(cartId));
+        }
+        this.selectedStates.clear();
+        this.selectedStates.putAll(newSelectedStates);
+        notifyDataSetChanged();
+    }
+
+    public void clearSelections() {
+        selectedStates.clear();
+        for (CartDisplayItem item : items) {
+            item.setSelected(false);
+        }
         notifyDataSetChanged();
     }
 
@@ -44,12 +79,24 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
     @Override
     public CartViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_cart, parent, false);
-        return new CartViewHolder(view, listener, items); // Truyền list items vào ViewHolder
+        return new CartViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull CartViewHolder holder, int position) {
-        holder.bind(items.get(position));
+        CartDisplayItem item = items.get(position);
+        holder.bind(item);
+
+        holder.cbSelect.setOnCheckedChangeListener(null); // Tránh gọi listener khi tái sử dụng view
+        holder.cbSelect.setChecked(item.isSelected());
+
+        holder.cbSelect.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            item.setSelected(isChecked); // Cập nhật trạng thái trong DTO
+            selectedStates.put(item.getCartItem().getCartID(), isChecked); // Cập nhật trong Map
+            if (listener != null) {
+                listener.onItemSelected(item, isChecked);
+            }
+        });
     }
 
     @Override
@@ -57,128 +104,84 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         return items.size();
     }
 
-    public static class CartViewHolder extends RecyclerView.ViewHolder {
-        private final TextView tvName, tvPrice, tvQuantity;
-        private final ImageView imgProduct;
-        private final ImageButton btnIncrease, btnDecrease, btnDelete;
-        private final CheckBox cbSelectItem;
+    class CartViewHolder extends RecyclerView.ViewHolder {
+        ShapeableImageView ivProductImage;
+        TextView tvProductName, tvProductPrice, tvQuantity;
+        ImageButton ivDecreaseQuantity, ivIncreaseQuantity, ivDelete;
+        CheckBox cbSelect;
 
-        private OnCartItemActionListener listener;
-        private List<CartDisplayItem> adapterItems; // Giữ tham chiếu đến list của adapter
-
-        public CartViewHolder(@NonNull View itemView, OnCartItemActionListener listener, List<CartDisplayItem> adapterItems) {
+        public CartViewHolder(@NonNull View itemView) {
             super(itemView);
-            this.listener = listener;
-            this.adapterItems = adapterItems; // Nhận list items
-            tvName = itemView.findViewById(R.id.tv_name);
-            tvPrice = itemView.findViewById(R.id.tv_price);
+            ivProductImage = itemView.findViewById(R.id.img_item);
+            tvProductName = itemView.findViewById(R.id.tv_name);
+            tvProductPrice = itemView.findViewById(R.id.tv_price);
             tvQuantity = itemView.findViewById(R.id.tv_quantity);
-            imgProduct = itemView.findViewById(R.id.img_item);
-            btnIncrease = itemView.findViewById(R.id.btn_increase);
-            btnDecrease = itemView.findViewById(R.id.btn_decrease);
-            btnDelete = itemView.findViewById(R.id.btn_delete);
-            cbSelectItem = itemView.findViewById(R.id.cb_select_item);
-
-            setupListeners(); // Chỉ gọi một lần trong constructor
-        }
-
-        private void setupListeners() {
-            btnIncrease.setOnClickListener(v -> {
-                if (listener != null) {
-                    int position = getAdapterPosition();
-                    if (position != RecyclerView.NO_POSITION) { // Đảm bảo position hợp lệ
-                        CartDisplayItem currentItem = adapterItems.get(position);
-                        // Cập nhật quantity cục bộ trước để UI thay đổi ngay lập tức
-                        int currentQuantity = currentItem.getCartItem().getQuantity();
-                        int stockQuantity = currentItem.getProduct().getQuantity(); // Lấy stockQuantity
-
-                        if (currentQuantity < stockQuantity) { // Chỉ tăng nếu chưa đạt giới hạn stock
-                            listener.onIncreaseQuantity(currentItem); // Gọi listener để ViewModel xử lý
-                            currentItem.getCartItem().setQuantity(currentQuantity + 1); // Cập nhật tạm thời
-                            tvQuantity.setText(String.valueOf(currentQuantity + 1)); // Cập nhật UI
-                        } else {
-                            Toast.makeText(itemView.getContext(), "Số lượng đã đạt giới hạn tồn kho: " + stockQuantity, Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }
-            });
-
-            btnDecrease.setOnClickListener(v -> {
-                if (listener != null) {
-                    int position = getAdapterPosition();
-                    if (position != RecyclerView.NO_POSITION) {
-                        CartDisplayItem currentItem = adapterItems.get(position);
-                        int currentQuantity = currentItem.getCartItem().getQuantity();
-
-                        if (currentQuantity > 1) { // Chỉ giảm nếu lớn hơn 1
-                            listener.onDecreaseQuantity(currentItem); // Gọi listener để ViewModel xử lý
-                            currentItem.getCartItem().setQuantity(currentQuantity - 1); // Cập nhật tạm thời
-                            tvQuantity.setText(String.valueOf(currentQuantity - 1)); // Cập nhật UI
-                        } else {
-                            Toast.makeText(itemView.getContext(), "Số lượng không thể nhỏ hơn 1.", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }
-            });
-
-            btnDelete.setOnClickListener(v -> {
-                if (listener != null) {
-                    int position = getAdapterPosition();
-                    if (position != RecyclerView.NO_POSITION) {
-                        listener.onDeleteItem(adapterItems.get(position));
-                    }
-                }
-            });
-
-            cbSelectItem.setOnCheckedChangeListener(null); // Xóa listener cũ trước khi gán mới
-            cbSelectItem.setChecked(false); // Reset trạng thái để tránh gọi listener khi recycle
-
-            // Đặt listener mới
-            cbSelectItem.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if (listener != null) {
-                    int position = getAdapterPosition();
-                    if (position != RecyclerView.NO_POSITION) {
-                        CartDisplayItem currentItem = adapterItems.get(position);
-                        currentItem.setSelected(isChecked);
-                        listener.onItemSelected(currentItem, isChecked);
-                    }
-                }
-            });
+            ivDecreaseQuantity = itemView.findViewById(R.id.btn_decrease);
+            ivIncreaseQuantity = itemView.findViewById(R.id.btn_increase);
+            ivDelete = itemView.findViewById(R.id.btn_delete);
+            cbSelect = itemView.findViewById(R.id.cb_select_item);
         }
 
         public void bind(CartDisplayItem item) {
-            // Không cần setOnClickListener ở đây nữa!
-            // Chỉ cần cập nhật UI
-            tvName.setText(item.getProduct().getProductName());
-
-            DecimalFormat format = new DecimalFormat("#,##0₫");
-            tvPrice.setText(format.format(item.getProduct().getPrice()));
-
+            tvProductName.setText(item.getProduct().getProductName());
+            tvProductPrice.setText(decimalFormat.format(item.getProduct().getPrice()) + " VND");
             tvQuantity.setText(String.valueOf(item.getCartItem().getQuantity()));
 
-            // Quan trọng: Đặt trạng thái checkbox mà không kích hoạt listener để tránh vòng lặp
-            cbSelectItem.setOnCheckedChangeListener(null); // Tắt listener tạm thời
-            cbSelectItem.setChecked(item.isSelected());
-            setupListeners(); // Gán lại listener sau khi đã setChecked
-            // Hoặc bạn có thể chỉ gán lại OnCheckedChangeListener()
-            // `cbSelectItem.setOnCheckedChangeListener(listenerForCheckbox);`
-            // (cách này tốt hơn)
-
-            // Load ảnh
+            // *************************************************************************
+            // BẮT ĐẦU: Logic tải ảnh từ tài nguyên cục bộ (copy từ code cũ của bạn)
             String imgUrl = item.getProduct().getImageUrl();
+            Log.d("ImageLoadDebug", "Loading local image for product: " + item.getProduct().getProductName() + ", raw URL from DTO: " + imgUrl);
+
             if (imgUrl != null && !imgUrl.isEmpty()) {
                 String fileName = imgUrl.substring(imgUrl.lastIndexOf('/') + 1);
                 String noExt = fileName.contains(".") ? fileName.substring(0, fileName.lastIndexOf('.')) : fileName;
+                String resourceName = noExt.toLowerCase(); // Chuyển về chữ thường
+
+                Log.d("ImageLoadDebug", "Searching for local resource name: " + resourceName + " in package: " + itemView.getContext().getPackageName());
+
                 int resId = itemView.getContext().getResources().getIdentifier(
-                        noExt.toLowerCase(), "drawable", itemView.getContext().getPackageName());
+                        resourceName,   // Tên tài nguyên (ví dụ: "image_bb50e1")
+                        "drawable",     // Loại tài nguyên (kiểm tra lại thư mục ảnh của bạn là drawable hay mipmap)
+                        itemView.getContext().getPackageName()); // Package của ứng dụng
 
                 if (resId != 0) {
-                    imgProduct.setImageResource(resId);
+                    ivProductImage.setImageResource(resId);
+                    Log.d("ImageLoadDebug", "Successfully set local image for product: " + item.getProduct().getProductName());
                 } else {
-                    imgProduct.setImageResource(R.drawable.placeholder);
+                    ivProductImage.setImageResource(R.drawable.bunny); // Ảnh mặc định nếu không tìm thấy
+                    Log.e("ImageLoadDebug", "Local resource ID NOT FOUND for name: " + resourceName + ". Using default.");
                 }
             } else {
-                imgProduct.setImageResource(R.drawable.placeholder);
+                ivProductImage.setImageResource(R.drawable.bunny); // Ảnh mặc định nếu URL từ DTO rỗng/null
+                Log.w("ImageLoadDebug", "Image URL from DTO is null or empty for product: " + item.getProduct().getProductName() + ". Using default.");
+            }
+            // KẾT THÚC: Logic tải ảnh từ tài nguyên cục bộ
+            // *************************************************************************
+
+            ivIncreaseQuantity.setOnClickListener(v -> {
+                if (listener != null) listener.onIncreaseQuantity(item);
+            });
+            ivDecreaseQuantity.setOnClickListener(v -> {
+                if (listener != null) listener.onDecreaseQuantity(item);
+            });
+            ivDelete.setOnClickListener(v -> {
+                if (listener != null) listener.onDeleteItem(item);
+            });
+
+            // Logic kiểm tra stockQuantity
+            if (item.getCartItem().getQuantity() >= item.getProduct().getQuantity()) {
+                ivIncreaseQuantity.setEnabled(false);
+                ivIncreaseQuantity.setAlpha(0.5f);
+            } else {
+                ivIncreaseQuantity.setEnabled(true);
+                ivIncreaseQuantity.setAlpha(1.0f);
+            }
+            if (item.getCartItem().getQuantity() <= 1) {
+                ivDecreaseQuantity.setEnabled(false);
+                ivDecreaseQuantity.setAlpha(0.5f);
+            } else {
+                ivDecreaseQuantity.setEnabled(true);
+                ivDecreaseQuantity.setAlpha(1.0f);
             }
         }
     }

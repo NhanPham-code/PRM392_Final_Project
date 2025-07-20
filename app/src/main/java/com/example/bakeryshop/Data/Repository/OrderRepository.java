@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 
 import com.example.bakeryshop.Data.Api.ApiClient;
 import com.example.bakeryshop.Data.Api.ApiService;
+import com.example.bakeryshop.Data.DTO.CreateOrderDTO;
+import com.example.bakeryshop.Data.DTO.CreateOrderDetailDTO;
 import com.example.bakeryshop.Data.DTO.OrderResponse;
 import com.example.bakeryshop.Data.DTO.ReadOrderDTO;
 
@@ -30,6 +32,13 @@ public class OrderRepository  {
 
     public Call<OrderResponse> getAllOrderByUser(){
         return apiService.getAllOrderByUserToken("Bearer " + token);
+    }
+    public Call<ReadOrderDTO> createOrder(CreateOrderDTO order) {
+        return apiService.createOrder(order);
+    }
+
+    public Call<Void> createOrderDetail(CreateOrderDetailDTO orderDetail) {
+        return apiService.createOrderDetail(orderDetail);
     }
 
 }

@@ -7,102 +7,106 @@
     android:layout_margin="8dp"
     app:cardCornerRadius="8dp"
     app:cardElevation="4dp"
-    app:cardBackgroundColor="@color/colorCardBackground"> <LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:padding="12dp"
-    android:gravity="center_vertical">
-
-    <CheckBox
-        android:id="@+id/cb_select_item"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:buttonTint="@color/colorPrimaryDark" />
-
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/img_item"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/bunny"
-        android:background="@color/white" android:contentDescription="@string/product_image_description"/>
+    app:cardBackgroundColor="@color/colorCardBackground">
 
     <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp">
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:gravity="center_vertical">
 
-        <TextView
-            android:id="@+id/tv_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/sample_product_name"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="@color/colorTextPrimary"
-            android:maxLines="2"
-            android:ellipsize="end"/>
-
-        <TextView
-            android:id="@+id/tv_price"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/sample_product_price"
-            android:textSize="16sp"
-            android:textColor="@color/bakery_brown" android:layout_marginTop="4dp"/>
-
-        <LinearLayout
+        <CheckBox
+            android:id="@+id/cb_select_item"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginTop="8dp">
+            android:layout_marginEnd="8dp"
+            android:buttonTint="@color/colorPrimaryDark" />
 
-            <ImageButton
-                android:id="@+id/btn_decrease"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:src="@drawable/ic_cart_decrease"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/decrease_quantity_button"
-                app:tint="@color/colorPrimaryDark"/>
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/img_item"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/bunny"
+            android:background="@color/white"
+            android:contentDescription="@string/product_image_description"/>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp">
 
             <TextView
-                android:id="@+id/tv_quantity"
-                android:layout_width="wrap_content"
+                android:id="@+id/tv_name"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/sample_quantity"
-                android:textSize="16sp"
+                android:text="@string/sample_product_name"
+                android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="@color/colorTextPrimary"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"/>
+                android:maxLines="2"
+                android:ellipsize="end"/>
 
-            <ImageButton
-                android:id="@+id/btn_increase"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:src="@drawable/ic_cart_increase"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/increase_quantity_button"
-                app:tint="@color/colorPrimaryDark"/>
+            <TextView
+                android:id="@+id/tv_price"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/sample_product_price"
+                android:textSize="16sp"
+                android:textColor="@color/bakery_brown"
+                android:layout_marginTop="4dp"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="8dp">
+
+                <ImageButton
+                    android:id="@+id/btn_decrease"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_cart_decrease"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/decrease_quantity_button"
+                    app:tint="@color/colorPrimaryDark"/>
+
+                <TextView
+                    android:id="@+id/tv_quantity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/sample_quantity"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorTextPrimary"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"/>
+
+                <ImageButton
+                    android:id="@+id/btn_increase"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_cart_increase"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/increase_quantity_button"
+                    app:tint="@color/colorPrimaryDark"/>
+            </LinearLayout>
+
         </LinearLayout>
 
+        <ImageButton
+            android:id="@+id/btn_delete"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_cart_remove"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/delete_item_button"
+            app:tint="@color/colorPrimaryDark"/>
+
     </LinearLayout>
-
-    <ImageButton
-        android:id="@+id/btn_delete"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:src="@drawable/ic_cart_remove"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="@string/delete_item_button"
-        app:tint="@color/colorPrimaryDark"/>
-
-</LinearLayout>
 </com.google.android.material.card.MaterialCardView>

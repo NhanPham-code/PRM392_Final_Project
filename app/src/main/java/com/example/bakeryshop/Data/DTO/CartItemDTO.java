@@ -1,20 +1,53 @@
 package com.example.bakeryshop.Data.DTO;
 
-public class CartItemDTO {
+import com.google.gson.annotations.SerializedName; // Likely used for API calls
+import java.io.Serializable;
+
+public class CartItemDTO implements Serializable {
+    private static final long serialVersionUID = 1L; // Recommended for Serializable
+
+    @SerializedName("cartID")
     private int cartID;
-    private int userID;
+    @SerializedName("productID")
     private int productID;
+    @SerializedName("quantity")
     private int quantity;
-    private String latestUpdate;
+    // Add other fields from your actual CartItemDTO if they exist,
+    // e.g., @SerializedName("userID") private int userID;
 
-    public int getCartID() { return cartID; }
-    public void setCartID(int cartID) { this.cartID = cartID; }
-    public int getUserID() { return userID; }
-    public void setUserID(int userID) { this.userID = userID; }
-    public int getProductID() { return productID; }
-    public void setProductID(int productID) { this.productID = productID; }
-    public int getQuantity() { return quantity; }
-    public void setQuantity(int quantity) { this.quantity = quantity; }
+    public CartItemDTO() {
+        // Empty constructor for Retrofit/Gson
+    }
 
+    public CartItemDTO(int cartID, int productID, int quantity) {
+        this.cartID = cartID;
+        this.productID = productID;
+        this.quantity = quantity;
+    }
 
+    // Getters
+    public int getCartID() {
+        return cartID;
+    }
+
+    public int getProductID() {
+        return productID;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    // Setters (if needed, especially for updating quantity locally)
+    public void setCartID(int cartID) {
+        this.cartID = cartID;
+    }
+
+    public void setProductID(int productID) {
+        this.productID = productID;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
 }
