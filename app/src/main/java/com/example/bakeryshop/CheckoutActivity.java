@@ -1,5 +1,6 @@
 package com.example.bakeryshop;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.RadioButton;
@@ -7,6 +8,8 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -32,6 +35,7 @@ public class CheckoutActivity extends AppCompatActivity {
     private CartDisplayItemAdapter adapter;
     private List<CartDisplayItem> selectedItems = new ArrayList<>();
     private CheckoutViewModel viewModel;
+    private ActivityResultLauncher<Intent> vnPayLauncher;
 
     private final DecimalFormat decimalFormat = new DecimalFormat("#,##0.00");
 
@@ -48,7 +52,6 @@ public class CheckoutActivity extends AppCompatActivity {
 
         viewModel = new CheckoutViewModel(getApplicationContext());
 
-        // Nhận danh sách từ intent
         selectedItems = (List<CartDisplayItem>) getIntent().getSerializableExtra("selected_items");
         if (selectedItems == null) selectedItems = new ArrayList<>();
 
@@ -58,12 +61,29 @@ public class CheckoutActivity extends AppCompatActivity {
 
         updateTotalAmount();
 
+        // Đăng ký VNPay launcher trước khi dùng
+        vnPayLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK) {
+                        Toast.makeText(this, "Thanh toán VNPAY thành công!", Toast.LENGTH_SHORT).show();
+                        handleSubmitOrder("VNPAY");
+                    } else {
+                        Toast.makeText(this, "Thanh toán thất bại hoặc bị hủy", Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
+
         btnPlaceOrder.setOnClickListener(v -> handlePlaceOrder());
 
         viewModel.getOrderSuccess().observe(this, success -> {
             if (Boolean.TRUE.equals(success)) {
                 Toast.makeText(this, "Đặt hàng thành công!", Toast.LENGTH_SHORT).show();
-                finish(); // Quay về
+                // Quay về MainActivity thay vì chỉ finish()
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                finish();
             } else {
                 Toast.makeText(this, "Đặt hàng thất bại!", Toast.LENGTH_SHORT).show();
             }
@@ -71,11 +91,16 @@ public class CheckoutActivity extends AppCompatActivity {
     }
 
     private void updateTotalAmount() {
+        double total = calculateTotalAmount();
+        tvTotalAmount.setText("Tổng tiền: " + decimalFormat.format(total) + " VND");
+    }
+
+    private double calculateTotalAmount() {
         double total = 0;
         for (CartDisplayItem item : selectedItems) {
             total += item.getProduct().getPrice() * item.getCartItem().getQuantity();
         }
-        tvTotalAmount.setText("Tổng tiền: " + decimalFormat.format(total) + " VND");
+        return total;
     }
 
     private void handlePlaceOrder() {
@@ -85,16 +110,21 @@ public class CheckoutActivity extends AppCompatActivity {
             return;
         }
 
-        double total = 0;
-        for (CartDisplayItem item : selectedItems) {
-            total += item.getProduct().getPrice() * item.getCartItem().getQuantity();
-        }
-
+        double total = calculateTotalAmount();
         int selectedRadioId = rgPaymentMethod.getCheckedRadioButtonId();
-        RadioButton selectedRadioButton = findViewById(selectedRadioId);
-        String paymentMethod = selectedRadioButton != null ? selectedRadioButton.getText().toString() : "COD";
+        if (selectedRadioId == R.id.rb_cash_on_delivery) {
+            handleSubmitOrder("COD");
+        } else if (selectedRadioId == R.id.rb_bank_transfer) {
+            Intent intent = new Intent(this, VnPayWebViewActivity.class);
+            intent.putExtra("amount", total);
+            vnPayLauncher.launch(intent);
+        }
+    }
 
-        // Gửi lên ViewModel
+    private void handleSubmitOrder(String paymentMethod) {
+        String address = etShippingAddress.getText().toString().trim();
+        double total = calculateTotalAmount();
         viewModel.placeOrder(paymentMethod, address, total, selectedItems);
     }
 }
+
