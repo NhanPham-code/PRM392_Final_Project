@@ -2,6 +2,9 @@ package com.example.bakeryshop.Data.Api;
 
 import com.example.bakeryshop.Data.DTO.AddCartItemRequestDTO;
 import com.example.bakeryshop.Data.DTO.CartItemDTO;
+import com.example.bakeryshop.Data.DTO.FeedbackRequestDTO;
+import com.example.bakeryshop.Data.DTO.FeedbackResponseDTO;
+import com.example.bakeryshop.Data.DTO.FeedbackUpdateDTO;
 import com.example.bakeryshop.Data.DTO.LoginRequestDTO;
 import com.example.bakeryshop.Data.DTO.LoginResponseDTO;
 import com.example.bakeryshop.Data.DTO.ReadProductDTO;
@@ -55,5 +58,14 @@ public interface ApiService {
 
     @GET("users/info")
     Call<ReadUserDTO> getUserInfo(); // Lấy thông tin người dùng hiện tại
+    @POST("feedbacks/add")
+    Call<Void> createFeedback(@Body FeedbackRequestDTO feedback);
+    @GET("feedbacks") // hoặc "feedback/me" nếu chỉ muốn của người hiện tại
+    Call<List<FeedbackResponseDTO>> getAllFeedback();
+    @DELETE("feedbacks/{id}")
+    Call<Void> deleteFeedback(@Path("id") int id);
+
+    @PUT("feedbacks/{feedbackId}")
+    Call<Void> updateFeedback(@Path("feedbackId") int feedbackId, @Body FeedbackUpdateDTO dto);
 
 }
